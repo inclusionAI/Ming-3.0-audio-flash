@@ -1,114 +1,129 @@
+<div align="center">
+
 # Ming-3.0-audio-flash
 
-Ming-3.0-audio-flash is a native audio model for real-world speech scenarios. It supports speech recognition, long-audio understanding, speech and non-speech audio perception, audio reasoning, end-to-end spoken interaction, and tool-oriented workflows.
+### Hear clearly. Understand deeply. Act intelligently.
 
-## Core capabilities
+A native audio model built for real-world speech recognition, audio understanding,
+reasoning, and end-to-end spoken interaction.
 
-- **Complex speech recognition:** Chinese and English speech across dialects, accents, noisy environments, and multi-speaker meetings.
-- **Long-audio understanding:** Audio comprehension for recordings up to hour-long durations.
-- **Multi-dimensional perception:** Fine-grained understanding of speech, non-speech sounds, and music.
-- **Audio reasoning:** Analysis and reasoning directly over audio content.
-- **Audio interaction and execution:** End-to-end spoken dialogue and tool-oriented task execution.
+[![License: MIT](https://img.shields.io/badge/License-MIT-3da639.svg)](LICENSE)
+[![Transformers: 5.14.1](https://img.shields.io/badge/Transformers-5.14.1-ffcc4d.svg)](requirements-transformers.txt)
+[![Serving: vLLM--Omni](https://img.shields.io/badge/Serving-vLLM--Omni-7c3aed.svg)](#vllm-omni-serving)
 
-This repository provides two inference paths:
+[Hugging Face](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)
+· [ModelScope](https://modelscope.cn/models/inclusionAI/Ming-3.0-audio-flash)
+· [Cookbook](cookbook.ipynb)
+· [Examples](examples/README.md)
 
-- **vLLM-Omni** for an OpenAI-compatible serving API, including optional speech output.
-- **Transformers** for direct, text-output inference from a local model directory or Hugging Face model ID.
+</div>
 
-## Repository layout
+---
 
-```text
-cookbook.ipynb            Interactive inference walkthrough
-deploy/                  vLLM-Omni deployment profiles
-examples/
-  audio/                  Bundled example audio and metadata
-  README.md              Task-specific prompt recipes
-  openai_audio_chat.py   OpenAI-compatible audio client
-  openai_audio_streaming.py
-                         Streaming speech client and latency metrics
-  transformers_audio.py  Direct Transformers inference
-scripts/
-  serve.sh               vLLM-Omni server launcher
-requirements-client.txt
-                         API client dependencies
-requirements-transformers.txt
-                         Direct Transformers dependencies
-LICENSE                  MIT license
-```
+## Highlights
 
-## Model preparation
+| Capability | Description |
+| --- | --- |
+| **Complex speech recognition** | Chinese and English speech across dialects, accents, noisy environments, and multi-speaker meetings |
+| **Long-audio understanding** | Comprehension and analysis of recordings up to hour-long durations |
+| **Multi-dimensional perception** | Fine-grained understanding of speech, non-speech sounds, acoustic scenes, and music |
+| **Audio reasoning** | Analysis and reasoning directly over audio content |
+| **Audio interaction** | End-to-end spoken dialogue with optional synthesized speech output |
 
-The default model ID is `inclusionAI/Ming-3.0-audio-flash`. Download it from Hugging Face:
+Ming-3.0-audio-flash closes the loop from **hearing the sound**, to
+**understanding the information**, to **getting the task done**.
+
+## Choose Your Path
+
+| | vLLM-Omni | Transformers |
+| --- | --- | --- |
+| Best for | Serving and application integration | Local evaluation and research |
+| Input | Audio + text instruction | Audio + text instruction |
+| Output | Text, or text + speech | Text |
+| Interface | OpenAI-compatible API | Hugging Face AutoClass |
+| Dependencies | `requirements-client.txt` for the client | `requirements-transformers.txt` |
+
+## Quick Start
+
+### 1. Download the model
 
 ```bash
-pip install huggingface-hub
-huggingface-cli download inclusionAI/Ming-3.0-audio-flash \
+pip install -U huggingface_hub
+hf download inclusionAI/Ming-3.0-audio-flash \
   --local-dir inclusionAI/Ming-3.0-audio-flash
+
+export MODEL_PATH="$PWD/inclusionAI/Ming-3.0-audio-flash"
 ```
 
-For users in mainland China, ModelScope is recommended:
+<details>
+<summary>Download from ModelScope</summary>
 
 ```bash
-pip install modelscope
+pip install -U modelscope
 modelscope download --model inclusionAI/Ming-3.0-audio-flash \
   --local_dir inclusionAI/Ming-3.0-audio-flash \
   --revision master
+
+export MODEL_PATH="$PWD/inclusionAI/Ming-3.0-audio-flash"
 ```
 
-Set the downloaded checkpoint path:
+</details>
 
-```bash
-export MODEL_PATH=/path/to/Ming-3.0-audio-flash
-```
+The model directory contains the tokenizer, processor, model implementation,
+checkpoint shards, and Talker assets. Large model files are distributed through
+Hugging Face and ModelScope rather than this GitHub repository.
 
-The model directory must include the tokenizer, audio processor assets, model configuration files, and checkpoint shards. Speech output additionally requires the complete `talker/` checkpoint directory. The Talker implementation is provided by vLLM-Omni rather than duplicated in this repository.
+### 2. Start a server
 
-## vLLM-Omni serving
+Install a vLLM-Omni build containing the `bailing_moe_v3_audio` pipeline. The
+validated development stack is:
 
-Install a vLLM-Omni build that includes the `bailing_moe_v3_audio` pipeline. The following versions were used during development:
+| Package | Version |
+| --- | --- |
+| `vllm` | `0.30.0` |
+| `vllm-omni` | `0.1.dev5` |
 
-```text
-vllm 0.30.0
-vllm-omni 0.1.dev5
-```
-
-### Text output
-
-Text-only serving is suitable for ASR, audio understanding, and audio reasoning:
+Start text-output serving for ASR, understanding, and reasoning:
 
 ```bash
 MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
 ```
 
-### Text and speech output
-
-Use the full profile for end-to-end spoken responses:
+Or enable both text and synthesized speech output:
 
 ```bash
 MING_OUTPUT_MODE=audio ./scripts/serve.sh "$MODEL_PATH"
 ```
 
-The included profiles use four GPUs for the thinker. The full profile also places the talker on the fourth GPU. Adjust `devices`, `gpu_memory_utilization`, and sequence limits in `deploy/*.yaml` for your hardware.
+> [!NOTE]
+> The included deployment profiles use four GPUs for the thinker. The full
+> profile also places the Talker on GPU 3. Adjust `devices`, sequence limits,
+> and `gpu_memory_utilization` in `deploy/*.yaml` for your hardware.
 
-### Call the API
-
-Install the client dependency:
+### 3. Send a request
 
 ```bash
 pip install -r requirements-client.txt
 ```
 
-Audio understanding with a text response:
+**Speech recognition**
 
 ```bash
 python examples/openai_audio_chat.py examples/audio/introduce_ant_group.wav \
-  --prompt "Transcribe the speech and summarize the key points." \
+  --prompt "Recognize the language and transcribe the speech with appropriate punctuation." \
   --prompt-as-system \
   --max-tokens 256 \
   --no-repeat-ngram-size 10
 ```
 
-Audio interaction with both text and speech responses:
+**Audio understanding**
+
+```bash
+python examples/openai_audio_chat.py recording.wav \
+  --prompt "Summarize the key information in this audio."
+```
+
+**Spoken response**
 
 ```bash
 python examples/openai_audio_chat.py spoken_question.wav \
@@ -117,7 +132,7 @@ python examples/openai_audio_chat.py spoken_question.wav \
   --output-audio outputs/answer.wav
 ```
 
-Stream text and PCM speech while measuring TTFT, TTFA, and RTF:
+**Streaming spoken response with latency metrics**
 
 ```bash
 python examples/openai_audio_streaming.py spoken_question.wav \
@@ -125,17 +140,22 @@ python examples/openai_audio_streaming.py spoken_question.wav \
   --output-audio outputs/stream_answer.wav
 ```
 
-The client defaults to `http://localhost:8091/v1` and automatically uses the first model returned by `/v1/models`. Override these settings with `--base-url`, `--api-key`, and `--model`, or with the corresponding `MING_BASE_URL`, `MING_API_KEY`, and `MING_MODEL` environment variables.
+The clients use `http://localhost:8091/v1` by default and automatically select
+the first model returned by `/v1/models`. Override the connection with
+`--base-url`, `--api-key`, and `--model`, or the corresponding `MING_*`
+environment variables.
 
-## Transformers inference
+## Transformers Inference
 
-For direct text-output inference, install the Transformers 5.14.1 dependencies in an isolated environment:
+Use an isolated environment for direct inference:
 
 ```bash
+python3 -m venv .venv-transformers
+source .venv-transformers/bin/activate
 pip install -r requirements-transformers.txt
 ```
 
-Speech recognition:
+**Speech recognition**
 
 ```bash
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
@@ -143,7 +163,7 @@ python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
   --task asr
 ```
 
-Audio question answering:
+**Spoken question answering**
 
 ```bash
 python examples/transformers_audio.py spoken_question.wav \
@@ -152,12 +172,36 @@ python examples/transformers_audio.py spoken_question.wav \
   --prompt "Answer the question in the audio."
 ```
 
-The Transformers path loads the model's registered AutoClasses with `trust_remote_code=True`, accepts one audio file per request, and produces text. Review downloaded model code before enabling remote code. Use vLLM-Omni with the full deployment profile when speech output is required.
+> [!IMPORTANT]
+> Direct inference loads the model's registered AutoClasses with
+> `trust_remote_code=True`. Review downloaded model code before enabling remote
+> code in your environment. Speech output is currently available through the
+> full vLLM-Omni pipeline.
 
-More task-specific commands are available in [`examples/README.md`](examples/README.md).
-For an interactive walkthrough, open [`cookbook.ipynb`](cookbook.ipynb) from the repository root.
+## More Examples
 
-## API request format
+- Explore task-specific prompts in [`examples/README.md`](examples/README.md).
+- Run the interactive walkthrough in [`cookbook.ipynb`](cookbook.ipynb).
+- Inspect the bundled sample and metadata in [`examples/audio/`](examples/audio/).
+
+## Repository Layout
+
+```text
+Ming-3.0-audio-flash/
+├── cookbook.ipynb                  # Interactive walkthrough
+├── deploy/                         # vLLM-Omni deployment profiles
+├── examples/
+│   ├── audio/                      # Sample audio and metadata
+│   ├── openai_audio_chat.py        # Text and non-streaming speech client
+│   ├── openai_audio_streaming.py   # Streaming speech and latency metrics
+│   └── transformers_audio.py       # Direct Transformers inference
+├── scripts/
+│   └── serve.sh                    # vLLM-Omni launcher
+├── requirements-client.txt         # Lightweight API client dependencies
+└── requirements-transformers.txt   # Direct inference dependencies
+```
+
+## API Format
 
 The OpenAI-compatible endpoint accepts audio as a base64 data URL:
 
@@ -176,4 +220,10 @@ messages = [
 ]
 ```
 
-Set `modalities=["text"]` for text-only output or `modalities=["text", "audio"]` for a spoken response.
+Use `modalities=["text"]` for text output or
+`modalities=["text", "audio"]` for text and synthesized speech.
+
+## License
+
+This project is released under the [MIT License](LICENSE). See [LEGAL.md](LEGAL.md)
+for the legal disclaimer.
