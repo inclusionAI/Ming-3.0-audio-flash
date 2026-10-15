@@ -18,14 +18,7 @@ This repository provides two inference paths:
 ## Repository layout
 
 ```text
-configuration_bailing_moe_v3*.py
-                         Model configuration
-modeling_bailing_moe_v3*.py
-                         Core model implementation
-processing_bailing_moe_v3_audio.py
-                         Audio processor implementation
 cookbook.ipynb            Interactive inference walkthrough
-data/                    Voice preset metadata and prompt audio
 deploy/                  vLLM-Omni deployment profiles
 examples/
   audio/                  Bundled example audio and metadata
@@ -67,8 +60,6 @@ export MODEL_PATH=/path/to/Ming-3.0-audio-flash
 ```
 
 The model directory must include the tokenizer, audio processor assets, model configuration files, and checkpoint shards. Speech output additionally requires the complete `talker/` checkpoint directory. The Talker implementation is provided by vLLM-Omni rather than duplicated in this repository.
-
-The bundled `data/` directory mirrors the validated voice presets. The released model checkpoint also contains these files so vLLM-Omni can resolve them directly from `MODEL_PATH`.
 
 ## vLLM-Omni serving
 
