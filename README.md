@@ -93,13 +93,11 @@ Hugging Face and ModelScope rather than this GitHub repository.
 
 ### 2️⃣ Start a Server
 
-Install a vLLM-Omni build containing the `bailing_moe_v3_audio` pipeline. The
-validated development stack is:
-
-| Package | Version |
-| --- | --- |
-| `vllm` | `0.30.0` |
-| `vllm-omni` | `0.1.dev5` |
+Install a vLLM-Omni build containing the `bailing_moe_v3_audio` pipeline and
+the current Ming Talker request interface. The server must support both IP
+voice routing through `voice_mode` and voice cloning through `ref_audio` plus
+`prompt_text`. Legacy builds that only support `voice_name` are incompatible
+with the speech-output examples below.
 
 Start text-output serving for ASR, understanding, and reasoning:
 
@@ -128,7 +126,7 @@ pip install -r requirements-client.txt
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
-  --prompt "Recognize the language and transcribe the speech with appropriate punctuation." \
+  --prompt "Please recognize the language of this speech and transcribe it, placing a ‘\t’ between the identified language and the transcribe." \
   --prompt-as-system \
   --max-tokens 256 \
   --no-repeat-ngram-size 10
@@ -139,15 +137,24 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --audio-response \
-  --voice-name DB30 \
   --output-audio outputs/answer.wav
+```
+
+By default, the Talker uses IP voice routing: Chinese responses use `灵小柔`
+and English responses use `Stella`. To clone a voice from a reference WAV:
+
+```bash
+python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
+  --audio-response \
+  --ref-audio path/to/reference.wav \
+  --prompt-text "Transcript of the reference audio." \
+  --output-audio outputs/cloned_answer.wav
 ```
 
 **Streaming spoken response with latency metrics**
 
 ```bash
 python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.wav \
-  --voice-name DB30 \
   --output-audio outputs/stream_answer.wav
 ```
 
@@ -171,7 +178,10 @@ pip install -r requirements-transformers.txt
 ```bash
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
   --model "$MODEL_PATH" \
-  --task asr
+  --task asr \
+  --prompt "Please recognize the language of this speech and transcribe it, placing a ‘\t’ between the identified language and the transcribe." \
+  --max-new-tokens 256 \
+  --no-repeat-ngram-size 10
 ```
 
 **Spoken question answering**
@@ -179,15 +189,41 @@ python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
 ```bash
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
   --model "$MODEL_PATH" \
-  --task qa \
-  --prompt "Answer the question in the audio."
+  --prompt "Answer the question or follow the instruction in the audio."
+```
+
+**Thinker + native Talker**
+
+Use the Talker implementation bundled with the model to generate speech
+without starting a vLLM-Omni server:
+
+```bash
+python examples/transformers_thinker_talker.py \
+  --model "$MODEL_PATH" \
+  --audio examples/audio/introduce_ant_group.wav \
+  --prompt "Answer the question or follow the instruction in the audio." \
+  --ip-name 灵小柔 \
+  --thinker-max-memory 72GiB \
+  --output outputs/answer.wav
+```
+
+Reference-audio voice cloning is also supported:
+
+```bash
+python examples/transformers_thinker_talker.py \
+  --model "$MODEL_PATH" \
+  --audio examples/audio/introduce_ant_group.wav \
+  --prompt "Answer the question or follow the instruction in the audio." \
+  --ref-audio path/to/reference.wav \
+  --prompt-text "参考音频对应的文本。" \
+  --output outputs/cloned_answer.wav
 ```
 
 > [!IMPORTANT]
 > Direct inference loads the model's registered AutoClasses with
 > `trust_remote_code=True`. Review downloaded model code before enabling remote
-> code in your environment. Speech output is currently available through the
-> full vLLM-Omni pipeline.
+> code in your environment. Native speech output additionally imports the
+> Talker implementation bundled in the model directory.
 
 ## 📚 More Examples
 
@@ -205,6 +241,7 @@ Ming-3.0-audio-flash/
 │   ├── audio/                      # Sample audio and metadata
 │   ├── vllm_omni_audio_chat.py      # Text and non-streaming speech client
 │   ├── vllm_omni_audio_streaming.py # Streaming speech and latency metrics
+│   ├── transformers_thinker_talker.py # Direct Thinker-to-Talker inference
 │   └── transformers_audio.py       # Direct Transformers inference
 ├── scripts/
 │   └── serve.sh                    # vLLM-Omni launcher
@@ -233,6 +270,21 @@ messages = [
 
 Use `modalities=["text"]` for text output or
 `modalities=["text", "audio"]` for text and synthesized speech.
+
+Talker IP voice routing uses:
+
+```python
+additional_information = {"voice_mode": "ip"}
+```
+
+Reference-audio voice cloning uses raw base64 audio and its transcript:
+
+```python
+additional_information = {
+    "ref_audio": reference_audio_base64,
+    "prompt_text": reference_audio_transcript,
+}
+```
 
 ## 📄 License
 

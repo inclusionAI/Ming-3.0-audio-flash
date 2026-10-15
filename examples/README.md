@@ -1,9 +1,8 @@
 # Example recipes
 
-The repository includes `audio/introduce_ant_group.wav` for quick validation.
-Its reference transcript and technical metadata are documented in
-[`audio/README.md`](audio/README.md). Verified model outputs will be added after
-the final release checkpoint is fixed.
+The repository includes samples for speech recognition, meeting understanding,
+music understanding, and tool calling. Their metadata is documented in
+[`audio/README.md`](audio/README.md).
 
 Run all commands from the repository root and set `MODEL_PATH` to the downloaded
 or local model directory.
@@ -18,7 +17,7 @@ MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
-  --prompt "Recognize the language and transcribe the speech with appropriate punctuation." \
+  --prompt "Please recognize the language of this speech and transcribe it, placing a ‘\t’ between the identified language and the transcribe." \
   --prompt-as-system \
   --max-tokens 256 \
   --no-repeat-ngram-size 10
@@ -45,7 +44,7 @@ python examples/vllm_omni_audio_chat.py examples/audio/meeting.mp3 \
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/music.mp3 \
-  --prompt "Analyze the genre, instruments, rhythm, mood, and structure of this music."
+  --prompt "Please transcribe the lyrics of this song and carefully describe its vocals, arrangement, instrumentation, style, genre, and other relevant aspects."
 ```
 
 ## Spoken response
@@ -63,8 +62,18 @@ For streaming speech output and latency metrics:
 
 ```bash
 python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.wav \
-  --voice-name DB30 \
   --output-audio outputs/stream_answer.wav
+```
+
+The Talker automatically routes Chinese responses to `灵小柔` and English
+responses to `Stella`. To use a cloned voice instead:
+
+```bash
+python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
+  --audio-response \
+  --ref-audio path/to/reference.wav \
+  --prompt-text "Transcript of the reference audio." \
+  --output-audio outputs/cloned_answer.wav
 ```
 
 ## Direct Transformers inference
@@ -74,14 +83,35 @@ Use a separate Transformers 5.14.1 environment with `requirements-transformers.t
 ```bash
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
   --model "$MODEL_PATH" \
-  --task asr
+  --task asr \
+  --prompt "Please recognize the language of this speech and transcribe it, placing a ‘\t’ between the identified language and the transcribe." \
+  --max-new-tokens 256 \
+  --no-repeat-ngram-size 10
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
   --model "$MODEL_PATH" \
-  --task qa \
-  --prompt "Answer the question in the audio."
+  --prompt "Answer the question or follow the instruction in the audio."
 python examples/transformers_audio.py examples/audio/meeting.mp3 \
   --model "$MODEL_PATH" \
-  --task qa \
+  --prompt "Transcribe this meeting, identify the speakers when possible, and summarize decisions and action items." \
+  --max-new-tokens 32768
+python examples/transformers_audio.py examples/audio/meeting.mp3 \
+  --model "$MODEL_PATH" \
   --prompt "Analyze the meeting and summarize the key decisions and action items." \
+  --max-new-tokens 32768 \
   --thinking
+python examples/transformers_audio.py examples/audio/music.mp3 \
+  --model "$MODEL_PATH" \
+  --prompt "Please transcribe the lyrics of this song and carefully describe its vocals, arrangement, instrumentation, style, genre, and other relevant aspects."
+```
+
+For end-to-end Thinker and native Talker inference:
+
+```bash
+python examples/transformers_thinker_talker.py \
+  --model "$MODEL_PATH" \
+  --audio examples/audio/introduce_ant_group.wav \
+  --prompt "Answer the question or follow the instruction in the audio." \
+  --ip-name 灵小柔 \
+  --thinker-max-memory 72GiB \
+  --output outputs/answer.wav
 ```

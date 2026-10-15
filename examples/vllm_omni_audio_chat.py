@@ -25,6 +25,15 @@ def audio_data_url(path: Path) -> str:
     return f"data:{media_type};base64,{encoded}"
 
 
+def talker_options(args: argparse.Namespace) -> dict[str, str]:
+    if args.ref_audio is None:
+        return {"voice_mode": "ip"}
+    return {
+        "ref_audio": base64.b64encode(args.ref_audio.read_bytes()).decode("ascii"),
+        "prompt_text": args.prompt_text,
+    }
+
+
 def resolve_model(client: OpenAI, requested_model: str | None) -> str:
     if requested_model:
         return requested_model
@@ -72,7 +81,15 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Request both text and synthesized speech",
     )
-    parser.add_argument("--voice-name", default="DB30")
+    parser.add_argument(
+        "--ref-audio",
+        type=Path,
+        help="Reference WAV for voice cloning; omit it to use automatic IP voices",
+    )
+    parser.add_argument(
+        "--prompt-text",
+        help="Transcript of --ref-audio, required for voice cloning",
+    )
     parser.add_argument(
         "--output-audio",
         type=Path,
@@ -81,6 +98,12 @@ def parse_args() -> argparse.Namespace:
     args = parser.parse_args()
     if not args.audio.is_file():
         parser.error(f"audio file does not exist: {args.audio}")
+    if args.ref_audio is not None and not args.ref_audio.is_file():
+        parser.error(f"reference audio file does not exist: {args.ref_audio}")
+    if args.ref_audio is not None and not args.prompt_text:
+        parser.error("--prompt-text is required with --ref-audio")
+    if args.prompt_text and args.ref_audio is None:
+        parser.error("--prompt-text requires --ref-audio")
     return args
 
 
@@ -125,7 +148,7 @@ def main() -> None:
             {"extra_args": {"no_repeat_ngram_size": args.no_repeat_ngram_size}}
         ]
     if args.audio_response:
-        extra_body["additional_information"] = {"voice_name": args.voice_name}
+        extra_body["additional_information"] = talker_options(args)
     if extra_body:
         request["extra_body"] = extra_body
 

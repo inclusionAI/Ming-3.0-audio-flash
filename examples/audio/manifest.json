@@ -9,6 +9,33 @@
       "sample_rate": 24000,
       "channels": 1,
       "encoding": "PCM signed 16-bit little-endian"
+    },
+    {
+      "id": "meeting",
+      "file": "meeting.mp3",
+      "task": "Meeting transcription and summarization",
+      "duration_seconds": 1244.688,
+      "sample_rate": 24000,
+      "channels": 1,
+      "encoding": "MP3"
+    },
+    {
+      "id": "music",
+      "file": "music.mp3",
+      "task": "Music understanding",
+      "duration_seconds": 152.88,
+      "sample_rate": 48000,
+      "channels": 2,
+      "encoding": "MP3"
+    },
+    {
+      "id": "tool_calling",
+      "file": "tool_calling.wav",
+      "task": "Tool calling",
+      "duration_seconds": 7.7,
+      "sample_rate": 16000,
+      "channels": 1,
+      "encoding": "PCM signed 16-bit little-endian"
     }
   ]
 }

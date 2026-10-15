@@ -15,6 +15,15 @@ from pathlib import Path
 import requests
 
 
+def talker_options(args: argparse.Namespace) -> dict[str, str]:
+    if args.ref_audio is None:
+        return {"voice_mode": "ip"}
+    return {
+        "ref_audio": base64.b64encode(args.ref_audio.read_bytes()).decode("ascii"),
+        "prompt_text": args.prompt_text,
+    }
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("audio", type=Path, help="Input audio file")
@@ -28,13 +37,27 @@ def parse_args() -> argparse.Namespace:
         "--system-prompt",
         default="Answer the question in the audio briefly without Markdown.",
     )
-    parser.add_argument("--voice-name", default="DB30")
+    parser.add_argument(
+        "--ref-audio",
+        type=Path,
+        help="Reference WAV for voice cloning; omit it to use automatic IP voices",
+    )
+    parser.add_argument(
+        "--prompt-text",
+        help="Transcript of --ref-audio, required for voice cloning",
+    )
     parser.add_argument("--max-tokens", type=int, default=128)
     parser.add_argument("--output-audio", type=Path, default=Path("outputs/stream_answer.wav"))
     parser.add_argument("--runs", type=int, default=1)
     args = parser.parse_args()
     if not args.audio.is_file():
         parser.error(f"audio file does not exist: {args.audio}")
+    if args.ref_audio is not None and not args.ref_audio.is_file():
+        parser.error(f"reference audio file does not exist: {args.ref_audio}")
+    if args.ref_audio is not None and not args.prompt_text:
+        parser.error("--prompt-text is required with --ref-audio")
+    if args.prompt_text and args.ref_audio is None:
+        parser.error("--prompt-text requires --ref-audio")
     if args.runs < 1:
         parser.error("--runs must be at least 1")
     return args
@@ -77,7 +100,7 @@ def stream_once(
         ],
         "modalities": ["text", "audio"],
         "audio": {"format": "pcm"},
-        "additional_information": {"voice_name": args.voice_name},
+        "additional_information": talker_options(args),
         "temperature": 0.0,
         "max_tokens": args.max_tokens,
         "stream": True,
