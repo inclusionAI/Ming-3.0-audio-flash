@@ -21,7 +21,7 @@ case "$output_mode" in
     deploy_config="$repo_dir/deploy/ming3_audio_flash_thinker_only.yaml"
     ;;
   audio)
-    deploy_config="$repo_dir/deploy/ming3_audio_flash.yaml"
+    deploy_config="$repo_dir/deploy/ming3_audio_flash_with_talker.yaml"
     if [[ ! -d "$model_path/talker" ]]; then
       echo "Speech output requires the talker directory: $model_path/talker" >&2
       exit 2
