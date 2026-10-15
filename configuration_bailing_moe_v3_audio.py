@@ -180,7 +180,6 @@ class BailingMoeV3AudioEncoderConfig(PretrainedConfig):
 
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path: Union[str, os.PathLike], **kwargs) -> "PretrainedConfig":
-        cls._set_token_in_kwargs(kwargs)
         config_dict, kwargs = cls.get_config_dict(pretrained_model_name_or_path, **kwargs)
         if "audio_config" in config_dict:
             config_dict = config_dict["audio_config"]
@@ -220,17 +219,8 @@ class BailingMoeV3AudioConfig(PretrainedConfig):
     def from_pretrained(
         cls, pretrained_model_name_or_path: Union[str, os.PathLike], **kwargs
     ) -> "BailingMoeV3AudioConfig":
-        cls._set_token_in_kwargs(kwargs)
         config_dict, kwargs = cls.get_config_dict(
             pretrained_model_name_or_path, **kwargs
         )
-        config_dict = {
-            key: value
-            for key, value in config_dict.items()
-            if not (
-                key.startswith(("vision", "image_", "video_"))
-                or key == "mrope_section"
-            )
-        }
         config_dict["model_type"] = cls.model_type
         return cls.from_dict(config_dict, **kwargs)

@@ -44,6 +44,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--system-prompt", default=DEFAULT_SYSTEM_PROMPT)
     parser.add_argument(
+        "--prompt-as-system",
+        action="store_true",
+        help="Use --prompt as the system message and send only audio as user content",
+    )
+    parser.add_argument(
         "--base-url",
         default=os.getenv("MING_BASE_URL", "http://localhost:8091/v1"),
     )
@@ -51,6 +56,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default=os.getenv("MING_MODEL"))
     parser.add_argument("--max-tokens", type=int, default=4096)
     parser.add_argument("--temperature", type=float, default=0.0)
+    parser.add_argument(
+        "--no-repeat-ngram-size",
+        type=int,
+        default=None,
+        help="Prevent repeated n-grams; use 10 for validated ASR evaluation",
+    )
     parser.add_argument(
         "--audio-response",
         action="store_true",
@@ -73,30 +84,43 @@ def main() -> None:
     client = OpenAI(base_url=args.base_url, api_key=args.api_key)
     model = resolve_model(client, args.model)
     modalities = ["text", "audio"] if args.audio_response else ["text"]
-
-    request = {
-        "model": model,
-        "messages": [
+    audio_content = {
+        "type": "audio_url",
+        "audio_url": {"url": audio_data_url(args.audio)},
+    }
+    if args.prompt_as_system:
+        messages = [
+            {"role": "system", "content": args.prompt},
+            {"role": "user", "content": [audio_content]},
+        ]
+    else:
+        messages = [
             {"role": "system", "content": args.system_prompt},
             {
                 "role": "user",
                 "content": [
                     {"type": "text", "text": args.prompt},
-                    {
-                        "type": "audio_url",
-                        "audio_url": {"url": audio_data_url(args.audio)},
-                    },
+                    audio_content,
                 ],
             },
-        ],
+        ]
+
+    request = {
+        "model": model,
+        "messages": messages,
         "modalities": modalities,
         "temperature": args.temperature,
         "max_tokens": args.max_tokens,
     }
+    extra_body = {}
+    if args.no_repeat_ngram_size is not None:
+        extra_body["sampling_params_list"] = [
+            {"extra_args": {"no_repeat_ngram_size": args.no_repeat_ngram_size}}
+        ]
     if args.audio_response:
-        request["extra_body"] = {
-            "additional_information": {"voice_name": args.voice_name}
-        }
+        extra_body["additional_information"] = {"voice_name": args.voice_name}
+    if extra_body:
+        request["extra_body"] = extra_body
 
     response = client.chat.completions.create(**request)
     message = response.choices[0].message

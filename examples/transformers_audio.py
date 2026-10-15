@@ -4,13 +4,11 @@ from __future__ import annotations
 
 import argparse
 import os
-import sys
 from pathlib import Path
 
 import torch
 from huggingface_hub import snapshot_download
-from packaging.version import Version
-from transformers import __version__ as transformers_version
+from transformers import AutoModelForCausalLM, AutoProcessor
 
 
 ASR_PROMPT = (
@@ -20,9 +18,6 @@ ASR_PROMPT = (
 )
 QA_PROMPT = "Answer the question in the audio. Return plain text without Markdown."
 DEFAULT_MODEL = os.getenv("MING_MODEL", "inclusionAI/Ming-3.0-audio-flash")
-REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-
-
 def resolve_model_path(model: str) -> Path:
     local_path = Path(model).expanduser()
     if local_path.is_dir():
@@ -58,34 +53,21 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    if Version(transformers_version).major >= 5:
-        raise RuntimeError(
-            "Ming-3.0-audio-flash direct inference requires transformers==4.56.2. "
-            "Install requirements-hf.txt in a separate virtual environment."
-        )
     model_path = resolve_model_path(args.model)
-    sys.path.insert(0, str(REPOSITORY_ROOT))
 
-    from modeling_bailing_moe_v3_audio import (  # noqa: PLC0415
-        BailingMoeV3AudioForConditionalGeneration,
-    )
-    from processing_bailing_moe_v3_audio import (  # noqa: PLC0415
-        BailingMoeV3AudioProcessor,
-    )
-
-    processor = BailingMoeV3AudioProcessor.from_pretrained(
+    processor = AutoProcessor.from_pretrained(
         model_path,
-        trust_remote_code=False,
+        trust_remote_code=True,
         use_fast=False,
     )
     model_kwargs = {
         "dtype": torch.bfloat16,
         "device_map": "auto",
-        "trust_remote_code": False,
+        "trust_remote_code": True,
     }
     if args.attn_implementation:
         model_kwargs["attn_implementation"] = args.attn_implementation
-    model = BailingMoeV3AudioForConditionalGeneration.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         model_path,
         **model_kwargs,
     ).eval()

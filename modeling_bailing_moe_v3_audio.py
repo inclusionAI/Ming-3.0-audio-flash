@@ -33,7 +33,7 @@ try:
 except ImportError:
     def is_torch_fx_available():
         return False
-from configuration_bailing_moe_v3_audio import (
+from .configuration_bailing_moe_v3_audio import (
     BailingMoeV3AudioConfig,
     BailingMoeV3AudioEncoderConfig,
 )
@@ -119,7 +119,7 @@ class WhisperEncoderForBailing(nn.Module):
         )
 
 
-from modeling_bailing_moe_v3 import BailingMoeV3Model
+from .modeling_bailing_moe_v3 import BailingMoeV3Model
 
 
 @dataclass
@@ -159,7 +159,7 @@ class BailingMoeV3AudioPreTrainedModel(PreTrainedModel):
 
 
 class BailingMoeV3AudioForConditionalGeneration(BailingMoeV3AudioPreTrainedModel, GenerationMixin):
-    _tied_weights_keys = ["lm_head.weight"]
+    _tied_weights_keys = {"lm_head.weight": "model.word_embeddings.weight"}
 
     def __init__(self, config: BailingMoeV3AudioConfig, **kwargs):
         super().__init__(config, **kwargs)
@@ -266,6 +266,13 @@ class BailingMoeV3AudioForConditionalGeneration(BailingMoeV3AudioPreTrainedModel
             cache_position is not None
             and cache_position.numel() > 0
             and cache_position[0].item() > 0
+        )
+        # Transformers 5 slices cached decoding with next_sequence_length
+        # instead of passing cache_position to remote models.
+        is_decode_step = is_decode_step or (
+            past_key_values is not None
+            and kwargs.get("next_sequence_length") is not None
+            and not kwargs.get("is_first_iteration", False)
         )
         if is_decode_step:
             model_inputs.pop("audio_feats", None)

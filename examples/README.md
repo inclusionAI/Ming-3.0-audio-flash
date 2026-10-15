@@ -15,7 +15,10 @@ MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
 
 ```bash
 python examples/openai_audio_chat.py examples/audio/introduce_ant_group.wav \
-  --prompt "Recognize the language and transcribe the speech with appropriate punctuation."
+  --prompt "Recognize the language and transcribe the speech with appropriate punctuation." \
+  --prompt-as-system \
+  --max-tokens 256 \
+  --no-repeat-ngram-size 10
 ```
 
 ## Meeting transcription and summary
@@ -57,9 +60,17 @@ python examples/openai_audio_chat.py spoken_question.wav \
   --output-audio outputs/answer.wav
 ```
 
+For streaming speech output and latency metrics:
+
+```bash
+python examples/openai_audio_streaming.py spoken_question.wav \
+  --voice-name DB30 \
+  --output-audio outputs/stream_answer.wav
+```
+
 ## Direct Transformers inference
 
-Use a separate environment with `requirements-hf.txt` installed:
+Use a separate Transformers 5.14.1 environment with `requirements-hf.txt` installed:
 
 ```bash
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav --task asr

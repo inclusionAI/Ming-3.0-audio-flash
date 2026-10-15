@@ -24,19 +24,20 @@ modeling_bailing_moe_v3*.py
                          Core model implementation
 processing_bailing_moe_v3_audio.py
                          Audio processor implementation
-talker/                  Talker and AudioVAE source code
 cookbook.ipynb            Interactive inference walkthrough
+data/                    Voice preset metadata and prompt audio
 deploy/                  vLLM-Omni deployment profiles
 examples/
   audio/                  Bundled example audio and metadata
   README.md              Task-specific prompt recipes
   openai_audio_chat.py   OpenAI-compatible audio client
+  openai_audio_streaming.py
+                         Streaming speech client and latency metrics
   transformers_audio.py  Direct Transformers inference
 scripts/
   serve.sh               vLLM-Omni server launcher
 requirements.txt         Client dependencies
 requirements-hf.txt      Direct Transformers dependencies
-requirements-talker.txt  Direct Talker dependencies
 LICENSE                  MIT license
 ```
 
@@ -65,9 +66,9 @@ Set the downloaded checkpoint path:
 export MODEL_PATH=/path/to/Ming-3.0-audio-flash
 ```
 
-The model directory must include the tokenizer, audio processor assets, model configuration files, and checkpoint shards. The direct Transformers example uses the model implementation tracked in this repository. Speech output additionally requires the complete `talker/` model directory.
+The model directory must include the tokenizer, audio processor assets, model configuration files, and checkpoint shards. Speech output additionally requires the complete `talker/` checkpoint directory. The Talker implementation is provided by vLLM-Omni rather than duplicated in this repository.
 
-As with Ming-Flash-Omni-2.0, this GitHub repository tracks the Talker implementation while the model repository stores its large runtime assets. Keep `talker/model.safetensors`, `talker/vae/model.safetensors`, `talker/campplus.onnx`, the Talker tokenizer, text-normalization FST files, and voice prompt audio in the Hugging Face or ModelScope checkpoint. See [`talker/README.md`](talker/README.md) for the expected layout.
+The bundled `data/` directory mirrors the validated voice presets. The released model checkpoint also contains these files so vLLM-Omni can resolve them directly from `MODEL_PATH`.
 
 ## vLLM-Omni serving
 
@@ -108,7 +109,10 @@ Audio understanding with a text response:
 
 ```bash
 python examples/openai_audio_chat.py examples/audio/introduce_ant_group.wav \
-  --prompt "Transcribe the speech and summarize the key points."
+  --prompt "Transcribe the speech and summarize the key points." \
+  --prompt-as-system \
+  --max-tokens 256 \
+  --no-repeat-ngram-size 10
 ```
 
 Audio interaction with both text and speech responses:
@@ -120,11 +124,19 @@ python examples/openai_audio_chat.py spoken_question.wav \
   --output-audio outputs/answer.wav
 ```
 
+Stream text and PCM speech while measuring TTFT, TTFA, and RTF:
+
+```bash
+python examples/openai_audio_streaming.py spoken_question.wav \
+  --voice-name DB30 \
+  --output-audio outputs/stream_answer.wav
+```
+
 The client defaults to `http://localhost:8091/v1` and automatically uses the first model returned by `/v1/models`. Override these settings with `--base-url`, `--api-key`, and `--model`, or with the corresponding `MING_BASE_URL`, `MING_API_KEY`, and `MING_MODEL` environment variables.
 
 ## Transformers inference
 
-For direct text-output inference, install the validated dependencies:
+For direct text-output inference, install the Transformers 5.14.1 dependencies in an isolated environment:
 
 ```bash
 pip install -r requirements-hf.txt
@@ -147,7 +159,7 @@ python examples/transformers_audio.py spoken_question.wav \
   --prompt "Answer the question in the audio."
 ```
 
-The Transformers path currently accepts one audio file per request and produces text. Use vLLM-Omni with the full deployment profile when speech output is required.
+The Transformers path loads the model's registered AutoClasses with `trust_remote_code=True`, accepts one audio file per request, and produces text. Review downloaded model code before enabling remote code. Use vLLM-Omni with the full deployment profile when speech output is required.
 
 More task-specific commands are available in [`examples/README.md`](examples/README.md).
 For an interactive walkthrough, open [`cookbook.ipynb`](cookbook.ipynb) from the repository root.

@@ -4,11 +4,12 @@ from pathlib import Path
 
 import torch
 import torchaudio
+import soundfile as sf
 import whisper
 from transformers import AutoTokenizer, BatchFeature
 from transformers.processing_utils import ProcessorMixin
 
-from configuration_bailing_moe_v3_audio import BailingMoeV3AudioConfig
+from .configuration_bailing_moe_v3_audio import BailingMoeV3AudioConfig
 
 
 class BailingMoeV3AudioProcessor(ProcessorMixin):
@@ -34,7 +35,8 @@ class BailingMoeV3AudioProcessor(ProcessorMixin):
 
     def _load_audio(self, audio):
         if isinstance(audio, (str, Path)):
-            waveform, sample_rate = torchaudio.load(str(audio), backend="soundfile")
+            samples, sample_rate = sf.read(str(audio), dtype="float32", always_2d=True)
+            waveform = torch.from_numpy(samples.T.copy())
         elif isinstance(audio, tuple) and len(audio) == 2:
             waveform, sample_rate = audio
             waveform = torch.as_tensor(waveform)

@@ -33,6 +33,11 @@ case "$output_mode" in
     ;;
 esac
 
+export VLLM_ALLREDUCE_USE_FLASHINFER=0
+export VLLM_ALLREDUCE_USE_SYMM_MEM=0
+export VLLM_ALLREDUCE_USE_FLASHINFER_PCIE_IPC=0
+export VLLM_USE_NCCL_SYMM_MEM=0
+
 exec vllm serve "$model_path" \
   --omni \
   --deploy-config "$deploy_config" \

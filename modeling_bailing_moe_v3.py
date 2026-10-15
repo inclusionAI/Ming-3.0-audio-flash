@@ -46,8 +46,12 @@ from transformers.utils import (
     logging,
     replace_return_docstrings,
 )
-from transformers.utils.import_utils import is_torch_fx_available
-from configuration_bailing_moe_v3 import BailingMoeV3Config
+try:
+    from transformers.utils.import_utils import is_torch_fx_available
+except ImportError:
+    def is_torch_fx_available():
+        return False
+from .configuration_bailing_moe_v3 import BailingMoeV3Config
 from transformers.generation.utils import GenerationMixin
 from dataclasses import dataclass
 from transformers.utils import ModelOutput
@@ -246,6 +250,15 @@ class BailingMoeV3GroupRMSNorm(nn.Module):
 ALL_LAYERNORM_LAYERS.append(BailingMoeV3RMSNorm)
 
 
+def _compute_default_rope_parameters(config, device=None, seq_len=None):
+    # Transformers 5 no longer includes the unscaled initializer in its registry.
+    dim = int(config.head_dim * getattr(config, "partial_rotary_factor", 1.0))
+    inv_freq = 1.0 / (
+        config.rope_theta ** (torch.arange(0, dim, 2, device=device).float() / dim)
+    )
+    return inv_freq, 1.0
+
+
 class BailingMoeV3RotaryEmbedding(nn.Module):
     def __init__(self, config: BailingMoeV3Config, device=None):
         super().__init__()
@@ -260,7 +273,11 @@ class BailingMoeV3RotaryEmbedding(nn.Module):
         self.config = deepcopy(config)
         self.config.head_dim = config.qk_rope_head_dim
         self.config.partial_rotary_factor = 1.0
-        self.rope_init_fn = ROPE_INIT_FUNCTIONS[self.rope_type]
+        self.rope_init_fn = (
+            _compute_default_rope_parameters
+            if self.rope_type == "default"
+            else ROPE_INIT_FUNCTIONS[self.rope_type]
+        )
 
         inv_freq, self.attention_scaling = self.rope_init_fn(self.config, device)
         self.register_buffer("inv_freq", inv_freq, persistent=False)
@@ -672,8 +689,8 @@ class BailingMoeV3MultiLatentAttention(nn.Module):
         self.scaling = self.qk_head_dim ** (-0.5)
         if self.config.rope_scaling is not None:
             mscale_all_dim = self.config.rope_scaling.get("mscale_all_dim", 0)
-            scaling_factor = self.config.rope_scaling["factor"]
             if mscale_all_dim:
+                scaling_factor = self.config.rope_scaling["factor"]
                 mscale = yarn_get_mscale(scaling_factor, mscale_all_dim)
                 self.scaling = self.scaling * mscale * mscale
 
@@ -1349,8 +1366,14 @@ class BailingMoeV3Model(BailingMoeV3PreTrainedModel):
         if inputs_embeds is None:
             inputs_embeds = self.word_embeddings(input_ids)
 
+        # Recurrent KDA states do not encode sequence length. Use the first
+        # softmax attention cache for positions as well as the causal mask.
+        softmax_attention_layer_id = min(self.config.layer_group_size - 1, self.config.num_hidden_layers - 1)
         if cache_position is None:
-            past_seen_tokens = past_key_values.get_seq_length() if past_key_values is not None else 0
+            past_seen_tokens = (
+                past_key_values.get_seq_length(layer_idx=softmax_attention_layer_id)
+                if past_key_values is not None else 0
+            )
             cache_position: torch.Tensor = torch.arange(
                 past_seen_tokens, past_seen_tokens + inputs_embeds.shape[1], device=inputs_embeds.device
             )
@@ -1358,7 +1381,6 @@ class BailingMoeV3Model(BailingMoeV3PreTrainedModel):
         if position_ids is None:
             position_ids = cache_position.unsqueeze(0)
 
-        softmax_attention_layer_id = self.config.layer_group_size - 1
         past_seen_tokens = (
             past_key_values.get_seq_length(layer_idx=softmax_attention_layer_id) if past_key_values is not None else 0
         )
@@ -1519,7 +1541,7 @@ class BailingMoeV3Model(BailingMoeV3PreTrainedModel):
 
 
 class BailingMoeV3ForCausalLM(BailingMoeV3PreTrainedModel, GenerationMixin):
-    _tied_weights_keys = ["lm_head.weight"]
+    _tied_weights_keys = {"lm_head.weight": "model.word_embeddings.weight"}
 
     def __init__(self, config: BailingMoeV3Config):
         super().__init__(config)
