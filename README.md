@@ -29,8 +29,10 @@ examples/
   transformers_audio.py  Direct Transformers inference
 scripts/
   serve.sh               vLLM-Omni server launcher
-requirements.txt         Client dependencies
-requirements-hf.txt      Direct Transformers dependencies
+requirements-client.txt
+                         API client dependencies
+requirements-transformers.txt
+                         Direct Transformers dependencies
 LICENSE                  MIT license
 ```
 
@@ -93,7 +95,7 @@ The included profiles use four GPUs for the thinker. The full profile also place
 Install the client dependency:
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-client.txt
 ```
 
 Audio understanding with a text response:
@@ -130,7 +132,7 @@ The client defaults to `http://localhost:8091/v1` and automatically uses the fir
 For direct text-output inference, install the Transformers 5.14.1 dependencies in an isolated environment:
 
 ```bash
-pip install -r requirements-hf.txt
+pip install -r requirements-transformers.txt
 ```
 
 Speech recognition:

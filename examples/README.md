@@ -70,7 +70,7 @@ python examples/openai_audio_streaming.py spoken_question.wav \
 
 ## Direct Transformers inference
 
-Use a separate Transformers 5.14.1 environment with `requirements-hf.txt` installed:
+Use a separate Transformers 5.14.1 environment with `requirements-transformers.txt` installed:
 
 ```bash
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav --task asr
