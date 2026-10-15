@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+.venv*/
+venv/
+.env
+.idea/
+.vscode/
+
+outputs/
+*.log
+
+# Model checkpoints belong on Hugging Face or ModelScope, not in Git.
+*.safetensors
+*.safetensors.index.json
+*.bin
+*.ckpt
+*.onnx
+*.pt
+*.pth
+
+# Talker runtime assets are distributed with the model checkpoint.
+talker/llm/
+talker/**/*.fst
+talker/data/**/*.wav

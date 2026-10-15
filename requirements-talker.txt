@@ -1,0 +1,8 @@
+-r requirements-hf.txt
+
+onnxruntime==1.20.1
+x-transformers==2.15.2
+pynini==2.1.7
+inflect
+loguru==0.7.3
+PyYAML

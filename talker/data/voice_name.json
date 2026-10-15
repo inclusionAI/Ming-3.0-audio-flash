@@ -1,0 +1,10 @@
+{
+  "DB30": {
+    "prompt_text": "感谢你的认可。",
+    "prompt_wav_path": "data/spks/prompt.wav"
+  },
+  "lingguang": {
+    "prompt_text": "诶，你今天有空吗？我们能不能聊聊这件事啊？",
+    "prompt_wav_path": "data/lg/prompt_15014.wav"
+  }
+}

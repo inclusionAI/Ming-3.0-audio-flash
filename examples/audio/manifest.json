@@ -1,0 +1,14 @@
+{
+  "samples": [
+    {
+      "id": "introduce_ant_group",
+      "file": "introduce_ant_group.wav",
+      "language": "English",
+      "reference_text": "Please introduce Ant Group.",
+      "duration_seconds": 2.48,
+      "sample_rate": 24000,
+      "channels": 1,
+      "encoding": "PCM signed 16-bit little-endian"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "aggregator": {
+    "attn_backend": "torch",
+    "attn_mask_enabled": false,
+    "depth": 8,
+    "dropout": 0.1,
+    "hidden_size": 1024,
+    "in_channels": 64,
+    "mlp_ratio": 4,
+    "num_heads": 16,
+    "pe_attn_head": null,
+    "qk_norm": null
+  },
+  "architectures": [
+    "BailingTalker2"
+  ],
+  "cfg_strength": 2.0,
+  "flowmodel": {
+    "attn_backend": "torch",
+    "attn_mask_enabled": false,
+    "depth": 8,
+    "dropout": 0,
+    "hidden_size": 1024,
+    "in_channels": 64,
+    "mlp_ratio": 4,
+    "num_heads": 16,
+    "pe_attn_head": null,
+    "qk_norm": null
+  },
+  "history_patch_size": 32,
+  "patch_size": 4,
+  "steps": 10,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.51.3"
+}
