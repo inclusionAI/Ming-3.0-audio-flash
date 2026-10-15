@@ -6,7 +6,7 @@ for the ASR and spoken-question examples.
 Reference speech content:
 
 ```text
-Please introduce Ant Group.
+介绍一下蚂蚁集团。
 ```
 
 Model outputs are intentionally not recorded yet. Add verified outputs after

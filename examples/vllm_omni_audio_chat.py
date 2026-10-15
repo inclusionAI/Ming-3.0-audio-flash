@@ -57,6 +57,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-tokens", type=int, default=4096)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument(
+        "--thinking",
+        action="store_true",
+        help="Enable detailed thinking through the model chat template",
+    )
+    parser.add_argument(
         "--no-repeat-ngram-size",
         type=int,
         default=None,
@@ -113,6 +118,8 @@ def main() -> None:
         "max_tokens": args.max_tokens,
     }
     extra_body = {}
+    if args.thinking:
+        extra_body["chat_template_kwargs"] = {"enable_thinking": True}
     if args.no_repeat_ngram_size is not None:
         extra_body["sampling_params_list"] = [
             {"extra_args": {"no_repeat_ngram_size": args.no_repeat_ngram_size}}

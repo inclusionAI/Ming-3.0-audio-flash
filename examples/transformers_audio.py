@@ -18,6 +18,8 @@ ASR_PROMPT = (
 )
 QA_PROMPT = "Answer the question in the audio. Return plain text without Markdown."
 DEFAULT_MODEL = os.getenv("MING_MODEL", "inclusionAI/Ming-3.0-audio-flash")
+
+
 def resolve_model_path(model: str) -> Path:
     local_path = Path(model).expanduser()
     if local_path.is_dir():
@@ -41,6 +43,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--max-new-tokens", type=int, default=512)
     parser.add_argument(
+        "--thinking",
+        action="store_true",
+        help="Enable detailed thinking through the model chat template",
+    )
+    parser.add_argument(
         "--attn-implementation",
         choices=("eager", "sdpa", "flash_attention_2"),
         default=None,
@@ -49,6 +56,23 @@ def parse_args() -> argparse.Namespace:
     if not args.audio.is_file():
         parser.error(f"audio file does not exist: {args.audio}")
     return args
+
+
+def process_messages(processor, messages, enable_thinking: bool):
+    if not enable_thinking:
+        return processor(messages)
+
+    apply_chat_template = processor.tokenizer.apply_chat_template
+
+    def apply_thinking_template(*args, **kwargs):
+        kwargs["enable_thinking"] = True
+        return apply_chat_template(*args, **kwargs)
+
+    processor.tokenizer.apply_chat_template = apply_thinking_template
+    try:
+        return processor(messages)
+    finally:
+        processor.tokenizer.apply_chat_template = apply_chat_template
 
 
 def main() -> None:
@@ -92,7 +116,7 @@ def main() -> None:
             },
         ]
 
-    inputs = processor(messages).to(model.device)
+    inputs = process_messages(processor, messages, args.thinking).to(model.device)
     inputs["audio_feats"] = inputs["audio_feats"].to(model.dtype)
     with torch.inference_mode():
         output_ids = model.generate(

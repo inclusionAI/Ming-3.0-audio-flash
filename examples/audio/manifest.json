@@ -3,8 +3,8 @@
     {
       "id": "introduce_ant_group",
       "file": "introduce_ant_group.wav",
-      "language": "English",
-      "reference_text": "Please introduce Ant Group.",
+      "language": "Chinese",
+      "reference_text": "介绍一下蚂蚁集团。",
       "duration_seconds": 2.48,
       "sample_rate": 24000,
       "channels": 1,

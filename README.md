@@ -33,6 +33,24 @@ reasoning, and end-to-end spoken interaction.
 Ming-3.0-audio-flash closes the loop from **hearing the sound**, to
 **understanding the information**, to **getting the task done**.
 
+## 📊 Benchmarks
+
+All scores are reported as percentages. ↑ means higher is better, while ↓
+means lower is better. Ming-3.0-audio-flash is evaluated in non-thinking mode.
+
+### Speech Recognition
+
+[![ASR benchmark results](assets/benchmark-asr.png)](assets/benchmark-asr.png)
+
+### Audio Intelligence
+
+[![Audio intelligence benchmark results](assets/benchmark-audio-intelligence.png)](assets/benchmark-audio-intelligence.png)
+
+> [!NOTE]
+> Results for comparison models are reproduced under our evaluation setup and
+> may differ from their official reports due to differences in prompts,
+> decoding settings, model versions, and evaluation pipelines.
+
 ## 🧭 Choose Your Path
 
 | | vLLM-Omni | Transformers |
@@ -116,17 +134,10 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --no-repeat-ngram-size 10
 ```
 
-**Audio understanding**
-
-```bash
-python examples/vllm_omni_audio_chat.py recording.wav \
-  --prompt "Summarize the key information in this audio."
-```
-
 **Spoken response**
 
 ```bash
-python examples/vllm_omni_audio_chat.py spoken_question.wav \
+python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --audio-response \
   --voice-name DB30 \
   --output-audio outputs/answer.wav
@@ -135,7 +146,7 @@ python examples/vllm_omni_audio_chat.py spoken_question.wav \
 **Streaming spoken response with latency metrics**
 
 ```bash
-python examples/vllm_omni_audio_streaming.py spoken_question.wav \
+python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.wav \
   --voice-name DB30 \
   --output-audio outputs/stream_answer.wav
 ```
@@ -166,7 +177,7 @@ python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
 **Spoken question answering**
 
 ```bash
-python examples/transformers_audio.py spoken_question.wav \
+python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
   --model "$MODEL_PATH" \
   --task qa \
   --prompt "Answer the question in the audio."

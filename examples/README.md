@@ -5,6 +5,9 @@ Its reference transcript and technical metadata are documented in
 [`audio/README.md`](audio/README.md). Verified model outputs will be added after
 the final release checkpoint is fixed.
 
+Run all commands from the repository root and set `MODEL_PATH` to the downloaded
+or local model directory.
+
 Start a text-output vLLM-Omni server before running these commands:
 
 ```bash
@@ -24,29 +27,25 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
 ## Meeting transcription and summary
 
 ```bash
-python examples/vllm_omni_audio_chat.py meeting.wav \
-  --prompt "Transcribe this meeting, identify the speakers when possible, and summarize decisions and action items."
+python examples/vllm_omni_audio_chat.py examples/audio/meeting.mp3 \
+  --prompt "Transcribe this meeting, identify the speakers when possible, and summarize decisions and action items." \
+  --max-tokens 256
 ```
 
-## Audio captioning
+## Thinking mode
 
 ```bash
-python examples/vllm_omni_audio_chat.py scene.wav \
-  --prompt "Describe the speech, background sounds, and acoustic environment in this recording."
+python examples/vllm_omni_audio_chat.py examples/audio/meeting.mp3 \
+  --prompt "Analyze the meeting and summarize the key decisions and action items." \
+  --max-tokens 256 \
+  --thinking
 ```
 
 ## Music understanding
 
 ```bash
-python examples/vllm_omni_audio_chat.py music.wav \
+python examples/vllm_omni_audio_chat.py examples/audio/music.mp3 \
   --prompt "Analyze the genre, instruments, rhythm, mood, and structure of this music."
-```
-
-## Audio reasoning
-
-```bash
-python examples/vllm_omni_audio_chat.py reasoning.wav \
-  --prompt "Answer the question in the audio. Use the audio evidence to reason, but output only the final answer."
 ```
 
 ## Spoken response
@@ -55,7 +54,7 @@ Restart the server with the full speech-output profile:
 
 ```bash
 MING_OUTPUT_MODE=audio ./scripts/serve.sh "$MODEL_PATH"
-python examples/vllm_omni_audio_chat.py spoken_question.wav \
+python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --audio-response \
   --output-audio outputs/answer.wav
 ```
@@ -63,7 +62,7 @@ python examples/vllm_omni_audio_chat.py spoken_question.wav \
 For streaming speech output and latency metrics:
 
 ```bash
-python examples/vllm_omni_audio_streaming.py spoken_question.wav \
+python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.wav \
   --voice-name DB30 \
   --output-audio outputs/stream_answer.wav
 ```
@@ -73,8 +72,16 @@ python examples/vllm_omni_audio_streaming.py spoken_question.wav \
 Use a separate Transformers 5.14.1 environment with `requirements-transformers.txt` installed:
 
 ```bash
-python examples/transformers_audio.py examples/audio/introduce_ant_group.wav --task asr
-python examples/transformers_audio.py spoken_question.wav \
+python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
+  --model "$MODEL_PATH" \
+  --task asr
+python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
+  --model "$MODEL_PATH" \
   --task qa \
   --prompt "Answer the question in the audio."
+python examples/transformers_audio.py examples/audio/meeting.mp3 \
+  --model "$MODEL_PATH" \
+  --task qa \
+  --prompt "Analyze the meeting and summarize the key decisions and action items." \
+  --thinking
 ```
