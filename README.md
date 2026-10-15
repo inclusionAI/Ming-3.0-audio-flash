@@ -51,7 +51,7 @@ means lower is better. Ming-3.0-audio-flash is evaluated in non-thinking mode.
 > may differ from their official reports due to differences in prompts,
 > decoding settings, model versions, and evaluation pipelines.
 
-## 🧭 Choose Your Path
+## 🧭 Inference Options
 
 | | vLLM-Omni | Transformers |
 | --- | --- | --- |
