@@ -14,7 +14,7 @@ MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
 ## Speech recognition
 
 ```bash
-python examples/openai_audio_chat.py examples/audio/introduce_ant_group.wav \
+python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --prompt "Recognize the language and transcribe the speech with appropriate punctuation." \
   --prompt-as-system \
   --max-tokens 256 \
@@ -24,28 +24,28 @@ python examples/openai_audio_chat.py examples/audio/introduce_ant_group.wav \
 ## Meeting transcription and summary
 
 ```bash
-python examples/openai_audio_chat.py meeting.wav \
+python examples/vllm_omni_audio_chat.py meeting.wav \
   --prompt "Transcribe this meeting, identify the speakers when possible, and summarize decisions and action items."
 ```
 
 ## Audio captioning
 
 ```bash
-python examples/openai_audio_chat.py scene.wav \
+python examples/vllm_omni_audio_chat.py scene.wav \
   --prompt "Describe the speech, background sounds, and acoustic environment in this recording."
 ```
 
 ## Music understanding
 
 ```bash
-python examples/openai_audio_chat.py music.wav \
+python examples/vllm_omni_audio_chat.py music.wav \
   --prompt "Analyze the genre, instruments, rhythm, mood, and structure of this music."
 ```
 
 ## Audio reasoning
 
 ```bash
-python examples/openai_audio_chat.py reasoning.wav \
+python examples/vllm_omni_audio_chat.py reasoning.wav \
   --prompt "Answer the question in the audio. Use the audio evidence to reason, but output only the final answer."
 ```
 
@@ -55,7 +55,7 @@ Restart the server with the full speech-output profile:
 
 ```bash
 MING_OUTPUT_MODE=audio ./scripts/serve.sh "$MODEL_PATH"
-python examples/openai_audio_chat.py spoken_question.wav \
+python examples/vllm_omni_audio_chat.py spoken_question.wav \
   --audio-response \
   --output-audio outputs/answer.wav
 ```
@@ -63,7 +63,7 @@ python examples/openai_audio_chat.py spoken_question.wav \
 For streaming speech output and latency metrics:
 
 ```bash
-python examples/openai_audio_streaming.py spoken_question.wav \
+python examples/vllm_omni_audio_streaming.py spoken_question.wav \
   --voice-name DB30 \
   --output-audio outputs/stream_answer.wav
 ```

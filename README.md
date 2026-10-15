@@ -109,7 +109,7 @@ pip install -r requirements-client.txt
 **Speech recognition**
 
 ```bash
-python examples/openai_audio_chat.py examples/audio/introduce_ant_group.wav \
+python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --prompt "Recognize the language and transcribe the speech with appropriate punctuation." \
   --prompt-as-system \
   --max-tokens 256 \
@@ -119,14 +119,14 @@ python examples/openai_audio_chat.py examples/audio/introduce_ant_group.wav \
 **Audio understanding**
 
 ```bash
-python examples/openai_audio_chat.py recording.wav \
+python examples/vllm_omni_audio_chat.py recording.wav \
   --prompt "Summarize the key information in this audio."
 ```
 
 **Spoken response**
 
 ```bash
-python examples/openai_audio_chat.py spoken_question.wav \
+python examples/vllm_omni_audio_chat.py spoken_question.wav \
   --audio-response \
   --voice-name DB30 \
   --output-audio outputs/answer.wav
@@ -135,7 +135,7 @@ python examples/openai_audio_chat.py spoken_question.wav \
 **Streaming spoken response with latency metrics**
 
 ```bash
-python examples/openai_audio_streaming.py spoken_question.wav \
+python examples/vllm_omni_audio_streaming.py spoken_question.wav \
   --voice-name DB30 \
   --output-audio outputs/stream_answer.wav
 ```
@@ -192,8 +192,8 @@ Ming-3.0-audio-flash/
 ├── deploy/                         # vLLM-Omni deployment profiles
 ├── examples/
 │   ├── audio/                      # Sample audio and metadata
-│   ├── openai_audio_chat.py        # Text and non-streaming speech client
-│   ├── openai_audio_streaming.py   # Streaming speech and latency metrics
+│   ├── vllm_omni_audio_chat.py      # Text and non-streaming speech client
+│   ├── vllm_omni_audio_streaming.py # Streaming speech and latency metrics
 │   └── transformers_audio.py       # Direct Transformers inference
 ├── scripts/
 │   └── serve.sh                    # vLLM-Omni launcher
