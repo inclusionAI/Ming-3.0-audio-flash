@@ -9,7 +9,7 @@ reasoning, and end-to-end spoken interaction.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-3da639.svg)](LICENSE)
 [![Transformers: 5.14.1](https://img.shields.io/badge/Transformers-5.14.1-ffcc4d.svg)](requirements-transformers.txt)
-[![Serving: vLLM--Omni](https://img.shields.io/badge/Serving-vLLM--Omni-7c3aed.svg)](#vllm-omni-serving)
+[![Serving: vLLM--Omni](https://img.shields.io/badge/Serving-vLLM--Omni-7c3aed.svg)](#-quick-start)
 
 [Hugging Face](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)
 · [ModelScope](https://modelscope.cn/models/inclusionAI/Ming-3.0-audio-flash)
@@ -20,7 +20,7 @@ reasoning, and end-to-end spoken interaction.
 
 ---
 
-## Highlights
+## ✨ Highlights
 
 | Capability | Description |
 | --- | --- |
@@ -33,7 +33,7 @@ reasoning, and end-to-end spoken interaction.
 Ming-3.0-audio-flash closes the loop from **hearing the sound**, to
 **understanding the information**, to **getting the task done**.
 
-## Choose Your Path
+## 🧭 Choose Your Path
 
 | | vLLM-Omni | Transformers |
 | --- | --- | --- |
@@ -43,9 +43,9 @@ Ming-3.0-audio-flash closes the loop from **hearing the sound**, to
 | Interface | OpenAI-compatible API | Hugging Face AutoClass |
 | Dependencies | `requirements-client.txt` for the client | `requirements-transformers.txt` |
 
-## Quick Start
+## 🚀 Quick Start
 
-### 1. Download the model
+### 1️⃣ Download the Model
 
 ```bash
 pip install -U huggingface_hub
@@ -73,7 +73,7 @@ The model directory contains the tokenizer, processor, model implementation,
 checkpoint shards, and Talker assets. Large model files are distributed through
 Hugging Face and ModelScope rather than this GitHub repository.
 
-### 2. Start a server
+### 2️⃣ Start a Server
 
 Install a vLLM-Omni build containing the `bailing_moe_v3_audio` pipeline. The
 validated development stack is:
@@ -100,7 +100,7 @@ MING_OUTPUT_MODE=audio ./scripts/serve.sh "$MODEL_PATH"
 > profile also places the Talker on GPU 3. Adjust `devices`, sequence limits,
 > and `gpu_memory_utilization` in `deploy/*.yaml` for your hardware.
 
-### 3. Send a request
+### 3️⃣ Send a Request
 
 ```bash
 pip install -r requirements-client.txt
@@ -145,7 +145,7 @@ the first model returned by `/v1/models`. Override the connection with
 `--base-url`, `--api-key`, and `--model`, or the corresponding `MING_*`
 environment variables.
 
-## Transformers Inference
+## 🤗 Transformers Inference
 
 Use an isolated environment for direct inference:
 
@@ -178,13 +178,13 @@ python examples/transformers_audio.py spoken_question.wav \
 > code in your environment. Speech output is currently available through the
 > full vLLM-Omni pipeline.
 
-## More Examples
+## 📚 More Examples
 
 - Explore task-specific prompts in [`examples/README.md`](examples/README.md).
 - Run the interactive walkthrough in [`cookbook.ipynb`](cookbook.ipynb).
 - Inspect the bundled sample and metadata in [`examples/audio/`](examples/audio/).
 
-## Repository Layout
+## 🗂️ Repository Layout
 
 ```text
 Ming-3.0-audio-flash/
@@ -201,7 +201,7 @@ Ming-3.0-audio-flash/
 └── requirements-transformers.txt   # Direct inference dependencies
 ```
 
-## API Format
+## 🔌 API Format
 
 The OpenAI-compatible endpoint accepts audio as a base64 data URL:
 
@@ -223,7 +223,7 @@ messages = [
 Use `modalities=["text"]` for text output or
 `modalities=["text", "audio"]` for text and synthesized speech.
 
-## License
+## 📄 License
 
 This project is released under the [MIT License](LICENSE). See [LEGAL.md](LEGAL.md)
 for the legal disclaimer.
