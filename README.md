@@ -33,10 +33,16 @@ reasoning, and end-to-end spoken interaction.
 Ming-3.0-audio-flash closes the loop from **hearing the sound**, to
 **understanding the information**, to **getting the task done**.
 
+## 🏗️ Architecture
+
+[![Ming-3.0-audio-flash architecture](assets/ming-3.0-audio-flash-architecture.png)](assets/ming-3.0-audio-flash-architecture.png)
+
 ## 📊 Benchmarks
 
 All scores are reported as percentages. ↑ means higher is better, while ↓
 means lower is better. Ming-3.0-audio-flash is evaluated in non-thinking mode.
+**Bold** indicates the best result, <u>underlined</u> indicates the second-best
+result, and an asterisk (`*`) indicates results obtained in our own evaluation.
 
 ### Speech Recognition
 
