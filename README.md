@@ -11,14 +11,24 @@ reasoning, and end-to-end spoken interaction.
 [![Transformers: 5.14.1](https://img.shields.io/badge/Transformers-5.14.1-ffcc4d.svg)](requirements-transformers.txt)
 [![Serving: vLLM--Omni](https://img.shields.io/badge/Serving-vLLM--Omni-7c3aed.svg)](requirements-vllm-omni.txt)
 
-[Hugging Face](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)
-· [ModelScope](https://modelscope.cn/models/inclusionAI/Ming-3.0-audio-flash)
+[Hugging Face · Flash](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)
+· [Hugging Face · Tiny](https://huggingface.co/inclusionAI/Ming-3.0-audio-tiny)
+· [ModelScope · Flash](https://modelscope.cn/models/inclusionAI/Ming-3.0-audio-flash)
 · [Cookbook](cookbook.ipynb)
 · [Examples](examples/README.md)
 
 </div>
 
 ---
+
+## 🧩 Model Variants
+
+- **[Ming-3.0-audio-flash](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)** —
+  The model documented in this repository and used by the examples and
+  benchmark results below.
+- **[Ming-3.0-audio-tiny](https://huggingface.co/inclusionAI/Ming-3.0-audio-tiny)** —
+  A compact member of the Ming-3.0-audio family. See its model card for
+  checkpoint details and usage guidance.
 
 ## ✨ Highlights
 
