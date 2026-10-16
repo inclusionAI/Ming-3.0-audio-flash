@@ -9,7 +9,7 @@ reasoning, and end-to-end spoken interaction.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-3da639.svg)](LICENSE)
 [![Transformers: 5.14.1](https://img.shields.io/badge/Transformers-5.14.1-ffcc4d.svg)](requirements-transformers.txt)
-[![Serving: vLLM--Omni](https://img.shields.io/badge/Serving-vLLM--Omni-7c3aed.svg)](#-quick-start)
+[![Serving: vLLM--Omni](https://img.shields.io/badge/Serving-vLLM--Omni-7c3aed.svg)](requirements-vllm-omni.txt)
 
 [Hugging Face](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)
 · [ModelScope](https://modelscope.cn/models/inclusionAI/Ming-3.0-audio-flash)
@@ -59,7 +59,7 @@ means lower is better. Ming-3.0-audio-flash is evaluated in non-thinking mode.
 | Input | Audio + text instruction | Audio + text instruction |
 | Output | Text, or text + speech | Text |
 | Interface | OpenAI-compatible API | Hugging Face AutoClass |
-| Dependencies | `requirements-client.txt` for the client | `requirements-transformers.txt` |
+| Dependencies | `requirements-vllm-omni.txt` for the server; `requirements-client.txt` for the client | `requirements-transformers.txt` |
 
 ## 🚀 Quick Start
 
@@ -93,11 +93,20 @@ Hugging Face and ModelScope rather than this GitHub repository.
 
 ### 2️⃣ Start a Server
 
-Install a vLLM-Omni build containing the `bailing_moe_v3_audio` pipeline and
-the current Ming Talker request interface. The server must support both IP
-voice routing through `voice_mode` and voice cloning through `ref_audio` plus
-`prompt_text`. Legacy builds that only support `voice_name` are incompatible
-with the speech-output examples below.
+Install the Ming-3.0-audio-flash branch of
+[inclusionAI/vllm-omni](https://github.com/inclusionAI/vllm-omni/tree/model/ming3-audio-flash):
+
+```bash
+python3 -m venv .venv-vllm-omni
+source .venv-vllm-omni/bin/activate
+pip install -r requirements-vllm-omni.txt
+```
+
+This branch contains the `bailing_moe_v3_audio` pipeline and the current Ming
+Talker request interface. It supports IP voice routing through `voice_mode`
+and voice cloning through `ref_audio` plus `prompt_text`. Legacy builds that
+only support `voice_name` are incompatible with the speech-output examples
+below.
 
 Start text-output serving for ASR, understanding, and reasoning:
 
@@ -126,8 +135,8 @@ pip install -r requirements-client.txt
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
+  --task asr \
   --prompt "Please recognize the language of this speech and transcribe it, placing a ‘\t’ between the identified language and the transcribe." \
-  --prompt-as-system \
   --max-tokens 256 \
   --no-repeat-ngram-size 10
 ```
@@ -141,7 +150,7 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
 ```
 
 By default, the Talker uses IP voice routing: Chinese responses use `灵小柔`
-and English responses use `Stella`. To clone a voice from a reference WAV:
+and English responses use `US_Stella`. To clone a voice from a reference WAV:
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
@@ -246,6 +255,7 @@ Ming-3.0-audio-flash/
 ├── scripts/
 │   └── serve.sh                    # vLLM-Omni launcher
 ├── requirements-client.txt         # Lightweight API client dependencies
+├── requirements-vllm-omni.txt      # Compatible vLLM-Omni server branch
 └── requirements-transformers.txt   # Direct inference dependencies
 ```
 

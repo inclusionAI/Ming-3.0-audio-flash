@@ -17,8 +17,8 @@ MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
+  --task asr \
   --prompt "Please recognize the language of this speech and transcribe it, placing a ‘\t’ between the identified language and the transcribe." \
-  --prompt-as-system \
   --max-tokens 256 \
   --no-repeat-ngram-size 10
 ```
@@ -28,7 +28,7 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/meeting.mp3 \
   --prompt "Transcribe this meeting, identify the speakers when possible, and summarize decisions and action items." \
-  --max-tokens 256
+  --max-tokens 32768
 ```
 
 ## Thinking mode
@@ -36,7 +36,7 @@ python examples/vllm_omni_audio_chat.py examples/audio/meeting.mp3 \
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/meeting.mp3 \
   --prompt "Analyze the meeting and summarize the key decisions and action items." \
-  --max-tokens 256 \
+  --max-tokens 32768 \
   --thinking
 ```
 
@@ -66,7 +66,7 @@ python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.
 ```
 
 The Talker automatically routes Chinese responses to `灵小柔` and English
-responses to `Stella`. To use a cloned voice instead:
+responses to `US_Stella`. To use a cloned voice instead:
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \

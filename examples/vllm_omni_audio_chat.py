@@ -6,6 +6,7 @@ import argparse
 import base64
 import mimetypes
 import os
+import sys
 from pathlib import Path
 
 from openai import OpenAI
@@ -14,6 +15,11 @@ from openai import OpenAI
 DEFAULT_SYSTEM_PROMPT = (
     "You are a voice assistant. Answer questions or execute commands based on "
     "the audio content. Return plain text without Markdown."
+)
+DEFAULT_PROMPT = "Answer the question or follow the instruction in the audio."
+ASR_PROMPT = (
+    "Please recognize the language of this speech and transcribe it, placing a ‘\\t’ "
+    "between the identified language and the transcribe."
 )
 
 
@@ -47,8 +53,14 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("audio", type=Path, help="Input audio file")
     parser.add_argument(
+        "--task",
+        choices=("chat", "asr"),
+        default="chat",
+        help="Use ASR-specific message formatting or general audio chat",
+    )
+    parser.add_argument(
         "--prompt",
-        default="Answer the question or follow the instruction in the audio.",
+        default=None,
         help="Instruction accompanying the audio",
     )
     parser.add_argument("--system-prompt", default=DEFAULT_SYSTEM_PROMPT)
@@ -104,6 +116,10 @@ def parse_args() -> argparse.Namespace:
         parser.error("--prompt-text is required with --ref-audio")
     if args.prompt_text and args.ref_audio is None:
         parser.error("--prompt-text requires --ref-audio")
+    if args.task == "asr" and args.prompt_as_system:
+        parser.error("--prompt-as-system cannot be used with --task asr")
+    if args.prompt is None:
+        args.prompt = ASR_PROMPT if args.task == "asr" else DEFAULT_PROMPT
     return args
 
 
@@ -116,7 +132,17 @@ def main() -> None:
         "type": "audio_url",
         "audio_url": {"url": audio_data_url(args.audio)},
     }
-    if args.prompt_as_system:
+    if args.task == "asr":
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    audio_content,
+                    {"type": "text", "text": args.prompt},
+                ],
+            }
+        ]
+    elif args.prompt_as_system:
         messages = [
             {"role": "system", "content": args.prompt},
             {"role": "user", "content": [audio_content]},
@@ -140,9 +166,9 @@ def main() -> None:
         "temperature": args.temperature,
         "max_tokens": args.max_tokens,
     }
-    extra_body = {}
-    if args.thinking:
-        extra_body["chat_template_kwargs"] = {"enable_thinking": True}
+    extra_body = {
+        "chat_template_kwargs": {"enable_thinking": args.thinking},
+    }
     if args.no_repeat_ngram_size is not None:
         extra_body["sampling_params_list"] = [
             {"extra_args": {"no_repeat_ngram_size": args.no_repeat_ngram_size}}
@@ -153,9 +179,15 @@ def main() -> None:
         request["extra_body"] = extra_body
 
     response = client.chat.completions.create(**request)
-    message = response.choices[0].message
+    choice = response.choices[0]
+    message = choice.message
     if message.content:
         print(message.content)
+    if choice.finish_reason == "length":
+        print(
+            "Warning: response reached --max-tokens and may be incomplete.",
+            file=sys.stderr,
+        )
 
     if args.audio_response:
         if message.audio is None or not message.audio.data:
