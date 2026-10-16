@@ -1,4 +1,4 @@
-"""Send an audio request to a Ming-3.0-audio-flash vLLM-Omni server."""
+"""Send an audio request to a Ming-3.0-audio vLLM-Omni server."""
 
 from __future__ import annotations
 

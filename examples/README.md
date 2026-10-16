@@ -13,6 +13,14 @@ Start the dedicated ASR profile for speech recognition:
 MING_OUTPUT_MODE=asr ./scripts/serve.sh "$MODEL_PATH"
 ```
 
+Flash and Tiny use the same inference client. To run Tiny ASR, point
+`MODEL_PATH` to the Tiny checkpoint and select the Tiny server profile:
+
+```bash
+export MODEL_PATH=inclusionAI/Ming-3.0-audio-tiny
+MING_MODEL_VARIANT=tiny MING_OUTPUT_MODE=asr ./scripts/serve.sh "$MODEL_PATH"
+```
+
 For the remaining text-output examples, start the general text profile instead:
 
 ```bash
