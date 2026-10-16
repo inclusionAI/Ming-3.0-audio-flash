@@ -132,16 +132,36 @@ Start text-output serving for ASR, understanding, and reasoning:
 MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
 ```
 
+Use the ASR profile when reproducing recognition evaluations with 10-gram
+blocking support:
+
+```bash
+MING_OUTPUT_MODE=asr ./scripts/serve.sh "$MODEL_PATH"
+```
+
 Or enable both text and synthesized speech output:
 
 ```bash
 MING_OUTPUT_MODE=audio ./scripts/serve.sh "$MODEL_PATH"
 ```
 
+For Ming-3.0-audio-tiny, point `MODEL_PATH` to the Tiny checkpoint and select
+the Tiny deployment profiles:
+
+```bash
+export MODEL_PATH="$PWD/inclusionAI/Ming-3.0-audio-tiny"
+MING_MODEL_VARIANT=tiny MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
+```
+
+`scripts/serve.sh` also detects Tiny automatically when the model directory
+name contains `tiny`. Set `MING_MODEL_VARIANT` explicitly when using a custom
+directory name.
+
 > [!NOTE]
-> The included deployment profiles use four GPUs for the thinker. The full
-> profile also places the Talker on GPU 3. Adjust `devices`, sequence limits,
-> and `gpu_memory_utilization` in `deploy/*.yaml` for your hardware.
+> The Flash deployment profiles use four GPUs for the thinker, and the full
+> profile also places the Talker on GPU 3. Tiny uses one GPU and reuses it for
+> the Talker. Adjust `devices`, sequence limits, and `gpu_memory_utilization`
+> in `deploy/*.yaml` for your hardware.
 
 ### 3️⃣ Send a Request
 

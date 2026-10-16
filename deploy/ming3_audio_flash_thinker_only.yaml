@@ -13,8 +13,8 @@ stages:
     tensor_parallel_size: 4
     enable_expert_parallel: false
     max_num_seqs: 1
-    max_model_len: 65536
-    max_num_batched_tokens: 2048
+    max_model_len: 131072
+    max_num_batched_tokens: 32768
     limit_mm_per_prompt:
       audio:
         count: 1
@@ -26,7 +26,7 @@ stages:
       temperature: 0.0
       top_p: 1.0
       top_k: -1
-      max_tokens: 256
+      max_tokens: 65536
       detokenize: true
       ignore_eos: false
 

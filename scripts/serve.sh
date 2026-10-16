@@ -4,6 +4,7 @@ set -euo pipefail
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 model_path="${1:-${MODEL_PATH:-}}"
 output_mode="${MING_OUTPUT_MODE:-text}"
+model_variant="${MING_MODEL_VARIANT:-}"
 port="${MING_PORT:-8091}"
 
 if [[ -z "$model_path" ]]; then
@@ -16,20 +17,54 @@ if [[ ! -d "$model_path" ]]; then
   exit 2
 fi
 
-case "$output_mode" in
-  text)
+if [[ -z "$model_variant" ]]; then
+  case "$(basename "$model_path")" in
+    *tiny*) model_variant="tiny" ;;
+    *) model_variant="flash" ;;
+  esac
+fi
+
+case "$model_variant" in
+  flash|tiny) ;;
+  *)
+    echo "MING_MODEL_VARIANT must be 'flash' or 'tiny', got: $model_variant" >&2
+    exit 2
+    ;;
+esac
+
+case "$model_variant:$output_mode" in
+  flash:text)
     deploy_config="$repo_dir/deploy/ming3_audio_flash_thinker_only.yaml"
     ;;
-  audio)
+  flash:asr)
+    deploy_config="$repo_dir/deploy/ming3_audio_flash_asr.yaml"
+    ;;
+  flash:audio)
     deploy_config="$repo_dir/deploy/ming3_audio_flash_with_talker.yaml"
-    if [[ ! -d "$model_path/talker" ]]; then
-      echo "Speech output requires the talker directory: $model_path/talker" >&2
-      exit 2
-    fi
+    ;;
+  tiny:text)
+    deploy_config="$repo_dir/deploy/ming3_audio_tiny_thinker_only.yaml"
+    ;;
+  tiny:asr)
+    deploy_config="$repo_dir/deploy/ming3_audio_tiny_asr.yaml"
+    ;;
+  tiny:audio)
+    deploy_config="$repo_dir/deploy/ming3_audio_tiny.yaml"
     ;;
   *)
-    echo "MING_OUTPUT_MODE must be 'text' or 'audio', got: $output_mode" >&2
+    echo "MING_OUTPUT_MODE must be 'text', 'asr', or 'audio', got: $output_mode" >&2
     exit 2
+    ;;
+esac
+
+case "$output_mode" in
+  text)
+    ;;
+  asr|audio)
+    if [[ ! -d "$model_path/talker" ]]; then
+      echo "The selected profile requires the talker directory: $model_path/talker" >&2
+      exit 2
+    fi
     ;;
 esac
 
