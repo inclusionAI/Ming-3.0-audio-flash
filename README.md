@@ -28,7 +28,7 @@ reasoning, and end-to-end spoken interaction.
   to hours in length.
 - 🎧 **Multi-dimensional perception** — Understands fine-grained speech,
   non-speech sounds, acoustic scenes, and music.
-- 🧠 **Audio reasoning** — Analyzes and reasons directly over audio content.
+- 💡 **Audio reasoning** — Analyzes and reasons directly over audio content.
 - 🗣️ **Audio interaction** — Supports end-to-end spoken dialogue with optional
   synthesized speech output.
 
