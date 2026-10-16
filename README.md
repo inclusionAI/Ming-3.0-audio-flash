@@ -22,13 +22,15 @@ reasoning, and end-to-end spoken interaction.
 
 ## ✨ Highlights
 
-| Capability | Description |
-| --- | --- |
-| **Complex speech recognition** | Chinese and English speech across dialects, accents, noisy environments, and multi-speaker meetings |
-| **Long-audio understanding** | Comprehension and analysis of recordings up to hour-long durations |
-| **Multi-dimensional perception** | Fine-grained understanding of speech, non-speech sounds, acoustic scenes, and music |
-| **Audio reasoning** | Analysis and reasoning directly over audio content |
-| **Audio interaction** | End-to-end spoken dialogue with optional synthesized speech output |
+- 🎙️ **Complex speech recognition** — Recognizes Chinese and English speech
+  across dialects, accents, noisy environments, and multi-speaker meetings.
+- ⏱️ **Long-audio understanding** — Comprehends and analyzes recordings up
+  to hours in length.
+- 🎧 **Multi-dimensional perception** — Understands fine-grained speech,
+  non-speech sounds, acoustic scenes, and music.
+- 🧠 **Audio reasoning** — Analyzes and reasons directly over audio content.
+- 🗣️ **Audio interaction** — Supports end-to-end spoken dialogue with optional
+  synthesized speech output.
 
 Ming-3.0-audio-flash closes the loop from **hearing the sound**, to
 **understanding the information**, to **getting the task done**.
