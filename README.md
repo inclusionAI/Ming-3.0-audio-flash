@@ -24,11 +24,11 @@ reasoning, and end-to-end spoken interaction.
 ## 🧩 Model Variants
 
 - **[Ming-3.0-audio-flash](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)** —
-  The model documented in this repository and used by the examples and
-  benchmark results below.
+  A 127B-parameter Mixture-of-Experts model with 7.3B activated parameters.
+  This is the model used by the examples and benchmark results below.
 - **[Ming-3.0-audio-tiny](https://huggingface.co/inclusionAI/Ming-3.0-audio-tiny)** —
-  A compact member of the Ming-3.0-audio family. See its model card for
-  checkpoint details and usage guidance.
+  A compact 10.3B-parameter Mixture-of-Experts model with 3.5B activated
+  parameters. See its model card for checkpoint details and usage guidance.
 
 ## ✨ Highlights
 

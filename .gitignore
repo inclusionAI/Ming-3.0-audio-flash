@@ -11,6 +11,7 @@ venv/
 .vscode/
 
 outputs/
+/inclusionAI/
 *.log
 
 # Model checkpoints belong on Hugging Face or ModelScope, not in Git.
