@@ -126,7 +126,7 @@ and voice cloning through `ref_audio` plus `prompt_text`. Legacy builds that
 only support `voice_name` are incompatible with the speech-output examples
 below.
 
-Start text-output serving for ASR, understanding, and reasoning:
+Start text-output serving for audio understanding and reasoning:
 
 ```bash
 MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
@@ -187,14 +187,15 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --output-audio outputs/answer.wav
 ```
 
-By default, the Talker uses IP voice routing: Chinese responses use `灵小柔`
-and English responses use `US_Stella`. To clone a voice from a reference WAV:
+By default, the Talker uses IP voice routing and selects a built-in voice for
+the response language. The English IP voice is `US_Stella`. To clone a voice
+from a reference WAV:
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --audio-response \
   --ref-audio path/to/reference.wav \
-  --prompt-text "Transcript of the reference audio." \
+  --prompt-text "<exact transcript of the reference audio>" \
   --output-audio outputs/cloned_answer.wav
 ```
 
@@ -249,7 +250,7 @@ python examples/transformers_thinker_talker.py \
   --model "$MODEL_PATH" \
   --audio examples/audio/introduce_ant_group.wav \
   --prompt "Answer the question or follow the instruction in the audio." \
-  --ip-name 灵小柔 \
+  --ip-name US_Stella \
   --thinker-max-memory 72GiB \
   --output outputs/answer.wav
 ```
@@ -262,7 +263,7 @@ python examples/transformers_thinker_talker.py \
   --audio examples/audio/introduce_ant_group.wav \
   --prompt "Answer the question or follow the instruction in the audio." \
   --ref-audio path/to/reference.wav \
-  --prompt-text "参考音频对应的文本。" \
+  --prompt-text "<exact transcript of the reference audio>" \
   --output outputs/cloned_answer.wav
 ```
 

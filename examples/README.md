@@ -7,7 +7,13 @@ music understanding, and tool calling. Their metadata is documented in
 Run all commands from the repository root and set `MODEL_PATH` to the downloaded
 or local model directory.
 
-Start a text-output vLLM-Omni server before running these commands:
+Start the dedicated ASR profile for speech recognition:
+
+```bash
+MING_OUTPUT_MODE=asr ./scripts/serve.sh "$MODEL_PATH"
+```
+
+For the remaining text-output examples, start the general text profile instead:
 
 ```bash
 MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
@@ -65,14 +71,14 @@ python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.
   --output-audio outputs/stream_answer.wav
 ```
 
-The Talker automatically routes Chinese responses to `灵小柔` and English
-responses to `US_Stella`. To use a cloned voice instead:
+The Talker automatically selects a built-in IP voice for the response language.
+The English IP voice is `US_Stella`. To use a cloned voice instead:
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --audio-response \
   --ref-audio path/to/reference.wav \
-  --prompt-text "Transcript of the reference audio." \
+  --prompt-text "<exact transcript of the reference audio>" \
   --output-audio outputs/cloned_answer.wav
 ```
 
@@ -111,7 +117,7 @@ python examples/transformers_thinker_talker.py \
   --model "$MODEL_PATH" \
   --audio examples/audio/introduce_ant_group.wav \
   --prompt "Answer the question or follow the instruction in the audio." \
-  --ip-name 灵小柔 \
+  --ip-name US_Stella \
   --thinker-max-memory 72GiB \
   --output outputs/answer.wav
 ```

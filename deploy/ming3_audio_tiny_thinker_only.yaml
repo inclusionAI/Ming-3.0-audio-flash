@@ -1,4 +1,4 @@
-# Ming-3.0-audio-tiny thinker-only: ASR and audio understanding with text output.
+# Ming-3.0-audio-tiny thinker-only: audio understanding with text output.
 pipeline: bailing_moe_v3_audio_thinker_only
 async_chunk: false
 trust_remote_code: false
