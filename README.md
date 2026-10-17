@@ -165,10 +165,11 @@ name contains `tiny`. Set `MING_MODEL_VARIANT` explicitly when using a custom
 directory name.
 
 > [!NOTE]
-> The Flash deployment profiles use four GPUs for the thinker, and the full
-> profile also places the Talker on GPU 3. Tiny uses one GPU and reuses it for
-> the Talker. Adjust `devices`, sequence limits, and `gpu_memory_utilization`
-> in `deploy/*.yaml` for your hardware.
+> The Flash full-audio profile uses four GPUs for the thinker and a separate
+> fifth GPU for the Talker. The Tiny full-audio profile uses one GPU per stage.
+> Text and ASR profiles are thinker-only and retain their smaller GPU layouts. Adjust `devices`,
+> sequence limits, and `gpu_memory_utilization` in `deploy/*.yaml` for your
+> hardware.
 
 #### SGLang
 

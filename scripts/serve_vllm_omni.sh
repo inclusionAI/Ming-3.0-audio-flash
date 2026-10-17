@@ -58,9 +58,9 @@ case "$model_variant:$output_mode" in
 esac
 
 case "$output_mode" in
-  text)
+  text|asr)
     ;;
-  asr|audio)
+  audio)
     if [[ ! -d "$model_path/talker" ]]; then
       echo "The selected profile requires the talker directory: $model_path/talker" >&2
       exit 2

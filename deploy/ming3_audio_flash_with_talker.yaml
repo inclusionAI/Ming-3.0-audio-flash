@@ -15,16 +15,14 @@ stages:
     disable_custom_all_reduce: true
     max_num_seqs: 1
     max_model_len: 131072
-    max_num_batched_tokens: 32768
+    max_num_batched_tokens: 8192
     limit_mm_per_prompt:
       audio:
         count: 1
         length: 20000000
-    gpu_memory_utilization: 0.78
-    enforce_eager: false
+    gpu_memory_utilization: 0.92
+    enforce_eager: true
     async_scheduling: false
-    compilation_config:
-      cudagraph_mode: FULL_AND_PIECEWISE
     default_sampling_params:
       temperature: 0.0
       top_p: 1.0
@@ -34,7 +32,7 @@ stages:
       ignore_eos: false
 
   - stage_id: 1
-    devices: "3"
+    devices: "4"
     max_num_seqs: 1
     max_num_batched_tokens: 8192
     gpu_memory_utilization: 0.18
