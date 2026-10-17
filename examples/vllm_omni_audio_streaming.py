@@ -17,7 +17,10 @@ import requests
 
 def talker_options(args: argparse.Namespace) -> dict[str, str]:
     if args.ref_audio is None:
-        return {"voice_mode": "ip"}
+        options = {"voice_mode": "ip"}
+        if args.ip_name:
+            options["ip_name"] = args.ip_name
+        return options
     return {
         "ref_audio": base64.b64encode(args.ref_audio.read_bytes()).decode("ascii"),
         "prompt_text": args.prompt_text,
@@ -37,7 +40,12 @@ def parse_args() -> argparse.Namespace:
         "--system-prompt",
         default="Answer the question in the audio briefly without Markdown.",
     )
-    parser.add_argument(
+    voice = parser.add_mutually_exclusive_group()
+    voice.add_argument(
+        "--ip-name",
+        help="Built-in voice name; omit it to select by response language",
+    )
+    voice.add_argument(
         "--ref-audio",
         type=Path,
         help="Reference WAV for voice cloning; omit it to use automatic IP voices",

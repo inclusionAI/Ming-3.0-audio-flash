@@ -10,6 +10,7 @@ reasoning, and end-to-end spoken interaction.
 [![License: MIT](https://img.shields.io/badge/License-MIT-3da639.svg)](LICENSE)
 [![Transformers: 5.14.1](https://img.shields.io/badge/Transformers-5.14.1-ffcc4d.svg)](requirements-transformers.txt)
 [![Serving: vLLM--Omni](https://img.shields.io/badge/Serving-vLLM--Omni-7c3aed.svg)](requirements-vllm-omni.txt)
+[![Serving: SGLang](https://img.shields.io/badge/Serving-SGLang-2563eb.svg)](requirements-sglang.txt)
 
 [Hugging Face · Flash](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)
 · [Hugging Face · Tiny](https://huggingface.co/inclusionAI/Ming-3.0-audio-tiny)
@@ -71,13 +72,13 @@ result, and an asterisk (`*`) indicates results obtained in our own evaluation.
 
 ## 🧭 Inference Options
 
-| | vLLM-Omni | Transformers |
-| --- | --- | --- |
-| Best for | Serving and application integration | Local evaluation and research |
-| Input | Audio + text instruction | Audio + text instruction |
-| Output | Text, or text + speech | Text |
-| Interface | OpenAI-compatible API | Hugging Face AutoClass |
-| Dependencies | `requirements-vllm-omni.txt` for the server; `requirements-client.txt` for the client | `requirements-transformers.txt` |
+| | vLLM-Omni | SGLang | Transformers |
+| --- | --- | --- | --- |
+| Best for | Serving and spoken interaction | High-throughput text serving | Local evaluation and research |
+| Input | Audio + text instruction | Audio + text instruction | Audio + text instruction |
+| Output | Text, or text + speech | Text | Text, or text + speech |
+| Interface | OpenAI-compatible API | OpenAI-compatible API | Hugging Face AutoClass |
+| Dependencies | `requirements-vllm-omni.txt` | `requirements-sglang.txt` | `requirements-transformers.txt` |
 
 ## 🚀 Quick Start
 
@@ -111,6 +112,8 @@ Hugging Face and ModelScope rather than this GitHub repository.
 
 ### 2️⃣ Start a Server
 
+#### vLLM-Omni
+
 Install the Ming-3.0-audio-flash branch of
 [inclusionAI/vllm-omni](https://github.com/inclusionAI/vllm-omni/tree/model/ming3-audio-flash):
 
@@ -129,20 +132,20 @@ below.
 Start text-output serving for audio understanding and reasoning:
 
 ```bash
-MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
+MING_OUTPUT_MODE=text ./scripts/serve_vllm_omni.sh "$MODEL_PATH"
 ```
 
 Use the ASR profile when reproducing recognition evaluations with 10-gram
 blocking support:
 
 ```bash
-MING_OUTPUT_MODE=asr ./scripts/serve.sh "$MODEL_PATH"
+MING_OUTPUT_MODE=asr ./scripts/serve_vllm_omni.sh "$MODEL_PATH"
 ```
 
 Or enable both text and synthesized speech output:
 
 ```bash
-MING_OUTPUT_MODE=audio ./scripts/serve.sh "$MODEL_PATH"
+MING_OUTPUT_MODE=audio ./scripts/serve_vllm_omni.sh "$MODEL_PATH"
 ```
 
 For Ming-3.0-audio-tiny, point `MODEL_PATH` to the Tiny checkpoint and select
@@ -150,10 +153,10 @@ the Tiny deployment profiles:
 
 ```bash
 export MODEL_PATH="$PWD/inclusionAI/Ming-3.0-audio-tiny"
-MING_MODEL_VARIANT=tiny MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
+MING_MODEL_VARIANT=tiny MING_OUTPUT_MODE=text ./scripts/serve_vllm_omni.sh "$MODEL_PATH"
 ```
 
-`scripts/serve.sh` also detects Tiny automatically when the model directory
+`scripts/serve_vllm_omni.sh` also detects Tiny automatically when the model directory
 name contains `tiny`. Set `MING_MODEL_VARIANT` explicitly when using a custom
 directory name.
 
@@ -163,7 +166,46 @@ directory name.
 > the Talker. Adjust `devices`, sequence limits, and `gpu_memory_utilization`
 > in `deploy/*.yaml` for your hardware.
 
+#### SGLang
+
+Install the audio branch of
+[inclusionAI/sglang_ling_v3](https://github.com/inclusionAI/sglang_ling_v3/tree/ling_v3_audio_for_pr)
+in a separate environment:
+
+```bash
+python3 -m venv .venv-sglang
+source .venv-sglang/bin/activate
+pip install -r requirements-sglang.txt
+```
+
+When the `sglang_ling_v3` source checkout is available next to this repository,
+install that exact checkout in editable mode instead:
+
+```bash
+pip install -e ../sglang_ling_v3/python
+```
+
+Start Ming-3.0-audio-flash with the validated four-GPU profile:
+
+```bash
+./scripts/serve_sglang.sh "$MODEL_PATH"
+```
+
+For Ming-3.0-audio-tiny, use its checkpoint and the single-GPU profile:
+
+```bash
+export MODEL_PATH="$PWD/inclusionAI/Ming-3.0-audio-tiny"
+MING_MODEL_VARIANT=tiny CUDA_VISIBLE_DEVICES=0 \
+  ./scripts/serve_sglang.sh "$MODEL_PATH"
+```
+
+The SGLang example currently covers audio input with text output. Use
+vLLM-Omni or direct Transformers inference when synthesized speech output is
+required.
+
 ### 3️⃣ Send a Request
+
+#### vLLM-Omni
 
 ```bash
 pip install -r requirements-client.txt
@@ -184,12 +226,16 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --audio-response \
+  --ip-name US_Stella \
   --output-audio outputs/answer.wav
 ```
 
 By default, the Talker uses IP voice routing and selects a built-in voice for
-the response language. The English IP voice is `US_Stella`. To clone a voice
-from a reference WAV:
+the response language. Pass `--ip-name` to select a specific voice; see the
+[complete built-in voice list](docs/voices.md). The defaults are `灵小柔` for
+Chinese and `US_Stella` for English. Voice names must match the list exactly.
+`--ip-name` selects a built-in voice and cannot be combined with `--ref-audio`.
+To clone a voice from a reference WAV instead:
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
@@ -203,6 +249,7 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
 
 ```bash
 python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.wav \
+  --ip-name US_Stella \
   --output-audio outputs/stream_answer.wav
 ```
 
@@ -210,6 +257,28 @@ The clients use `http://localhost:8091/v1` by default and automatically select
 the first model returned by `/v1/models`. Override the connection with
 `--base-url`, `--api-key`, and `--model`, or the corresponding `MING_*`
 environment variables.
+
+#### SGLang
+
+The SGLang client sends raw base64 audio using the branch's `input_audio`
+message format. Run ASR against the default endpoint at
+`http://localhost:8008/v1`:
+
+```bash
+python examples/sglang_audio_chat.py examples/audio/introduce_ant_group.wav \
+  --task asr \
+  --max-tokens 256
+```
+
+For general audio understanding, provide a custom instruction:
+
+```bash
+python examples/sglang_audio_chat.py examples/audio/introduce_ant_group.wav \
+  --prompt "Answer the question or follow the instruction in the audio."
+```
+
+Override the endpoint or served model with `--base-url` and `--model`, or with
+`MING_SGLANG_BASE_URL` and `MING_SGLANG_MODEL`.
 
 ## 🤗 Transformers Inference
 
@@ -287,20 +356,23 @@ Ming-3.0-audio-flash/
 ├── deploy/                         # vLLM-Omni deployment profiles
 ├── examples/
 │   ├── audio/                      # Sample audio and metadata
+│   ├── sglang_audio_chat.py         # SGLang text-output client
 │   ├── vllm_omni_audio_chat.py      # Text and non-streaming speech client
 │   ├── vllm_omni_audio_streaming.py # Streaming speech and latency metrics
 │   ├── transformers_thinker_talker.py # Direct Thinker-to-Talker inference
 │   └── transformers_audio.py       # Direct Transformers inference
 ├── scripts/
-│   └── serve.sh                    # vLLM-Omni launcher
+│   ├── serve_vllm_omni.sh          # vLLM-Omni launcher
+│   └── serve_sglang.sh             # SGLang launcher
 ├── requirements-client.txt         # Lightweight API client dependencies
+├── requirements-sglang.txt         # Compatible SGLang audio branch
 ├── requirements-vllm-omni.txt      # Compatible vLLM-Omni server branch
 └── requirements-transformers.txt   # Direct inference dependencies
 ```
 
 ## 🔌 API Format
 
-The OpenAI-compatible endpoint accepts audio as a base64 data URL:
+The vLLM-Omni endpoint accepts audio as a base64 data URL:
 
 ```python
 messages = [
@@ -320,11 +392,33 @@ messages = [
 Use `modalities=["text"]` for text output or
 `modalities=["text", "audio"]` for text and synthesized speech.
 
+The SGLang endpoint uses raw base64 audio in an `input_audio` content item:
+
+```python
+messages = [
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "input_audio",
+                "input_audio": {"data": audio_base64, "format": "wav"},
+            },
+            {"type": "text", "text": "Describe this audio."},
+        ],
+    }
+]
+```
+
 Talker IP voice routing uses:
 
 ```python
-additional_information = {"voice_mode": "ip"}
+additional_information = {
+    "voice_mode": "ip",
+    "ip_name": "灵小柔",
+}
 ```
+
+Omit `ip_name` to select the default built-in voice from the response language.
 
 Reference-audio voice cloning uses raw base64 audio and its transcript:
 

@@ -10,7 +10,7 @@ or local model directory.
 Start the dedicated ASR profile for speech recognition:
 
 ```bash
-MING_OUTPUT_MODE=asr ./scripts/serve.sh "$MODEL_PATH"
+MING_OUTPUT_MODE=asr ./scripts/serve_vllm_omni.sh "$MODEL_PATH"
 ```
 
 Flash and Tiny use the same inference client. To run Tiny ASR, point
@@ -18,13 +18,13 @@ Flash and Tiny use the same inference client. To run Tiny ASR, point
 
 ```bash
 export MODEL_PATH=inclusionAI/Ming-3.0-audio-tiny
-MING_MODEL_VARIANT=tiny MING_OUTPUT_MODE=asr ./scripts/serve.sh "$MODEL_PATH"
+MING_MODEL_VARIANT=tiny MING_OUTPUT_MODE=asr ./scripts/serve_vllm_omni.sh "$MODEL_PATH"
 ```
 
 For the remaining text-output examples, start the general text profile instead:
 
 ```bash
-MING_OUTPUT_MODE=text ./scripts/serve.sh "$MODEL_PATH"
+MING_OUTPUT_MODE=text ./scripts/serve_vllm_omni.sh "$MODEL_PATH"
 ```
 
 ## Speech recognition
@@ -66,9 +66,10 @@ python examples/vllm_omni_audio_chat.py examples/audio/music.mp3 \
 Restart the server with the full speech-output profile:
 
 ```bash
-MING_OUTPUT_MODE=audio ./scripts/serve.sh "$MODEL_PATH"
+MING_OUTPUT_MODE=audio ./scripts/serve_vllm_omni.sh "$MODEL_PATH"
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --audio-response \
+  --ip-name US_Stella \
   --output-audio outputs/answer.wav
 ```
 
@@ -80,7 +81,9 @@ python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.
 ```
 
 The Talker automatically selects a built-in IP voice for the response language.
-The English IP voice is `US_Stella`. To use a cloned voice instead:
+Pass `--ip-name` to select a specific voice from the
+[complete built-in voice list](../docs/voices.md). The defaults are `灵小柔` for
+Chinese and `US_Stella` for English. To use a cloned voice instead:
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
@@ -129,3 +132,28 @@ python examples/transformers_thinker_talker.py \
   --thinker-max-memory 72GiB \
   --output outputs/answer.wav
 ```
+
+## SGLang inference
+
+Install and start the SGLang audio branch from the repository root:
+
+```bash
+python3 -m venv .venv-sglang
+source .venv-sglang/bin/activate
+pip install -r requirements-sglang.txt
+./scripts/serve_sglang.sh "$MODEL_PATH"
+```
+
+For the adjacent `sglang_ling_v3` source checkout, replace the requirements
+installation with `pip install -e ../sglang_ling_v3/python`.
+
+Then send an ASR request to its OpenAI-compatible endpoint:
+
+```bash
+python examples/sglang_audio_chat.py examples/audio/introduce_ant_group.wav \
+  --task asr \
+  --max-tokens 256
+```
+
+SGLang currently provides text output for these examples; spoken output uses
+the vLLM-Omni or direct Transformers paths above.

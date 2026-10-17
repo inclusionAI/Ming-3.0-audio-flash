@@ -1,0 +1,1 @@
+sglang @ git+https://github.com/inclusionAI/sglang_ling_v3.git@ling_v3_audio_for_pr#subdirectory=python
