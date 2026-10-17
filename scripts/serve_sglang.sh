@@ -1,6 +1,50 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export LANG="${SGLANG_LOCALE:-C.UTF-8}"
+export LC_ALL="$LANG"
+
+filter_sglang_startup_warnings() {
+  local line
+  local suppress_torchcodec=0
+  local suppress_freeze_gc=0
+  local reported_torchcodec=0
+  local reported_freeze_gc=0
+
+  while IFS= read -r line; do
+    if [[ "$line" == *"Ignore import error when loading sglang.srt.multimodal.processors.mimo"* &&
+          "$line" == *"Could not load libtorchcodec"* ]]; then
+      suppress_torchcodec=1
+      if [[ "$reported_torchcodec" == "0" ]]; then
+        printf '%s\n' "[SGLang] Optional Mimo TorchCodec processors are unavailable; continuing with the Ming audio processor." >&2
+        reported_torchcodec=1
+      fi
+      continue
+    fi
+    if [[ "$suppress_torchcodec" == "1" ]]; then
+      if [[ "$line" == *"[end of libtorchcodec loading traceback]."* ]]; then
+        suppress_torchcodec=0
+      fi
+      continue
+    fi
+    if [[ "$line" == *"post-warmup freeze_gc failed"* ]]; then
+      suppress_freeze_gc=1
+      if [[ "$reported_freeze_gc" == "0" ]]; then
+        printf '%s\n' "[SGLang] Post-startup GC freeze was skipped; the server remains available." >&2
+        reported_freeze_gc=1
+      fi
+      continue
+    fi
+    if [[ "$suppress_freeze_gc" == "1" ]]; then
+      if [[ "$line" == requests.exceptions.* ]]; then
+        suppress_freeze_gc=0
+      fi
+      continue
+    fi
+    printf '%s\n' "$line" >&2
+  done
+}
+
 model_path="${1:-${MODEL_PATH:-}}"
 if [[ $# -gt 0 ]]; then
   shift
@@ -98,7 +142,15 @@ printf 'Endpoint:    http://%s:%s/v1\n' "$host" "$port"
 printf 'GPUs:        %s\n' "$CUDA_VISIBLE_DEVICES"
 printf 'Model name:  %s\n' "$served_model_name"
 
-exec "$python_bin" -u -m sglang.launch_server \
-  "${common_args[@]}" \
-  "${variant_args[@]}" \
-  "$@"
+if [[ "${SGLANG_FILTER_STARTUP_WARNINGS:-${SGLANG_FILTER_OPTIONAL_CODEC_WARNINGS:-1}}" == "1" ]]; then
+  exec "$python_bin" -u -m sglang.launch_server \
+    "${common_args[@]}" \
+    "${variant_args[@]}" \
+    "$@" \
+    2> >(filter_sglang_startup_warnings)
+else
+  exec "$python_bin" -u -m sglang.launch_server \
+    "${common_args[@]}" \
+    "${variant_args[@]}" \
+    "$@"
+fi
