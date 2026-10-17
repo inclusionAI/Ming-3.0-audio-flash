@@ -65,6 +65,10 @@ result, and an asterisk (`*`) indicates results obtained in our own evaluation.
 
 [![Audio intelligence benchmark results](assets/benchmark-audio-intelligence.png)](assets/benchmark-audio-intelligence.png)
 
+### Text Intelligence
+
+[![Text intelligence benchmark results](assets/benchmark-text.png)](assets/benchmark-text.png)
+
 > [!NOTE]
 > Results for comparison models are reproduced under our evaluation setup and
 > may differ from their official reports due to differences in prompts,
