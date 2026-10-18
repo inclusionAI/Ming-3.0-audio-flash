@@ -12,12 +12,18 @@ from transformers import AutoModelForCausalLM, AutoProcessor
 
 
 DEFAULT_SYSTEM_PROMPT = (
-    "You are a voice assistant. Answer questions or execute commands based on "
-    "the audio content. Return plain text without Markdown."
+    "You are a helpful assistant.\n"
+    "Listen to the user's audio and respond to their question or request.\n"
+    "Answer the question or carry out the requested task. For lists, provide "
+    "several concrete examples; for why/how questions, explain the main reason "
+    "or method. Follow the user's explicit instructions, including any "
+    "requirements for format, wording, and length. Answer directly and keep "
+    "your response concise but complete. Do not repeat or transcribe the "
+    "request unless asked to do so. Before responding, silently check that "
+    "your answer satisfies the requested constraints."
 )
-DEFAULT_PROMPT = "Answer the question or follow the instruction in the audio."
 ASR_PROMPT = (
-    "Please recognize the language of this speech and transcribe it, placing a ‘\\t’ "
+    "Please recognize the language of this speech and transcribe it, placing a `\\t` "
     "between the identified language and the transcribe."
 )
 DEFAULT_MODEL = os.getenv("MING_MODEL", "inclusionAI/Ming-3.0-audio-flash")
@@ -75,8 +81,10 @@ def parse_args() -> argparse.Namespace:
     args = parser.parse_args()
     if not args.audio.is_file():
         parser.error(f"audio file does not exist: {args.audio}")
-    if args.prompt is None:
-        args.prompt = ASR_PROMPT if args.task == "asr" else DEFAULT_PROMPT
+    if args.prompt is None and args.task == "asr":
+        args.prompt = ASR_PROMPT
+    if args.prompt_as_system and args.prompt is None:
+        parser.error("--prompt-as-system requires --prompt")
     return args
 
 
@@ -114,14 +122,14 @@ def build_messages(args: argparse.Namespace, audio_path: str) -> list[dict]:
             {"role": "system", "content": args.prompt},
             {"role": "user", "content": [audio_content]},
         ]
+    user_content = [audio_content]
+    if args.prompt is not None:
+        user_content.insert(0, {"type": "text", "text": args.prompt})
     return [
         {"role": "system", "content": args.system_prompt},
         {
             "role": "user",
-            "content": [
-                {"type": "text", "text": args.prompt},
-                audio_content,
-            ],
+            "content": user_content,
         },
     ]
 

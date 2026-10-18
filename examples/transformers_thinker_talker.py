@@ -19,10 +19,16 @@ from transformers import AutoConfig, AutoModelForCausalLM, AutoProcessor
 
 DEFAULT_MODEL = os.getenv("MING_MODEL", "inclusionAI/Ming-3.0-audio-flash")
 DEFAULT_SYSTEM_PROMPT = (
-    "You are a voice assistant. Answer questions or execute commands based on "
-    "the audio content. Return plain text without Markdown."
+    "You are a helpful assistant.\n"
+    "Listen to the user's audio and respond to their question or request.\n"
+    "Answer the question or carry out the requested task. For lists, provide "
+    "several concrete examples; for why/how questions, explain the main reason "
+    "or method. Follow the user's explicit instructions, including any "
+    "requirements for format, wording, and length. Answer directly and keep "
+    "your response concise but complete. Do not repeat or transcribe the "
+    "request unless asked to do so. Before responding, silently check that "
+    "your answer satisfies the requested constraints."
 )
-DEFAULT_AUDIO_PROMPT = "Answer the question or follow the instruction in the audio."
 TALKER_DEPENDENCIES = (
     "onnxruntime",
     "x_transformers",
@@ -57,7 +63,6 @@ def parse_args() -> argparse.Namespace:
     source.add_argument("--audio", type=Path, help="User audio sent to the Thinker")
     parser.add_argument(
         "--prompt",
-        default=DEFAULT_AUDIO_PROMPT,
         help="Instruction accompanying --audio",
     )
     parser.add_argument("--system-prompt", default=DEFAULT_SYSTEM_PROMPT)
@@ -107,6 +112,8 @@ def parse_args() -> argparse.Namespace:
         (args.ref_audio, args.ref_audio_base64, args.ref_audio_base64_file)
     ):
         parser.error("--prompt-text requires reference audio")
+    if args.prompt_as_system and args.prompt is None:
+        parser.error("--prompt-as-system requires --prompt")
     return args
 
 
@@ -136,14 +143,14 @@ def build_thinker_inputs(processor, args: argparse.Namespace):
                 {"role": "user", "content": [audio_content]},
             ]
         else:
+            user_content = [audio_content]
+            if args.prompt is not None:
+                user_content.insert(0, {"type": "text", "text": args.prompt})
             messages = [
                 {"role": "system", "content": args.system_prompt},
                 {
                     "role": "user",
-                    "content": [
-                        {"type": "text", "text": args.prompt},
-                        audio_content,
-                    ],
+                    "content": user_content,
                 },
             ]
         return processor(messages)

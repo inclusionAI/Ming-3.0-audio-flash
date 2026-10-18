@@ -35,7 +35,7 @@ MING_OUTPUT_MODE=text ./scripts/serve_vllm_omni.sh "$MODEL_PATH"
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --task asr \
-  --prompt "Please recognize the language of this speech and transcribe it, placing a ‘\t’ between the identified language and the transcribe." \
+  --prompt 'Please recognize the language of this speech and transcribe it, placing a `\t` between the identified language and the transcribe.' \
   --max-tokens 256 \
   --no-repeat-ngram-size 10
 ```
@@ -104,12 +104,11 @@ Use a separate Transformers 5.14.1 environment with `requirements-transformers.t
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
   --model "$MODEL_PATH" \
   --task asr \
-  --prompt "Please recognize the language of this speech and transcribe it, placing a ‘\t’ between the identified language and the transcribe." \
+  --prompt 'Please recognize the language of this speech and transcribe it, placing a `\t` between the identified language and the transcribe.' \
   --max-new-tokens 256 \
   --no-repeat-ngram-size 10
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
-  --model "$MODEL_PATH" \
-  --prompt "Answer the question or follow the instruction in the audio."
+  --model "$MODEL_PATH"
 python examples/transformers_audio.py examples/audio/meeting.mp3 \
   --model "$MODEL_PATH" \
   --prompt "Transcribe this meeting, identify the speakers when possible, and summarize decisions and action items." \
@@ -130,7 +129,6 @@ For end-to-end Thinker and native Talker inference:
 python examples/transformers_thinker_talker.py \
   --model "$MODEL_PATH" \
   --audio examples/audio/introduce_ant_group.wav \
-  --prompt "Answer the question or follow the instruction in the audio." \
   --ip-name US_Stella \
   --thinker-max-memory 72GiB \
   --output outputs/answer.wav

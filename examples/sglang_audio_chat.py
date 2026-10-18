@@ -13,9 +13,19 @@ import requests
 
 ASR_PROMPT = (
     "Please recognize the language of this speech and transcribe it, placing a "
-    "‘\\t’ between the identified language and the transcribe."
+    "`\\t` between the identified language and the transcribe."
 )
-DEFAULT_PROMPT = "Answer the question or follow the instruction in the audio."
+DEFAULT_SYSTEM_PROMPT = (
+    "You are a helpful assistant.\n"
+    "Listen to the user's audio and respond to their question or request.\n"
+    "Answer the question or carry out the requested task. For lists, provide "
+    "several concrete examples; for why/how questions, explain the main reason "
+    "or method. Follow the user's explicit instructions, including any "
+    "requirements for format, wording, and length. Answer directly and keep "
+    "your response concise but complete. Do not repeat or transcribe the "
+    "request unless asked to do so. Before responding, silently check that "
+    "your answer satisfies the requested constraints."
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -74,18 +84,21 @@ def main() -> None:
 
     base_url = args.base_url.rstrip("/")
     model = args.model or resolve_model(base_url, args.api_key, args.timeout)
-    prompt = args.prompt or (ASR_PROMPT if args.task == "asr" else DEFAULT_PROMPT)
+    prompt = args.prompt or (ASR_PROMPT if args.task == "asr" else None)
 
     messages: list[dict[str, Any]] = []
-    if args.system_prompt:
-        messages.append({"role": "system", "content": args.system_prompt})
+    system_prompt = args.system_prompt
+    if system_prompt is None and args.task == "chat":
+        system_prompt = DEFAULT_SYSTEM_PROMPT
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+    user_content = [audio_content(args.audio)]
+    if prompt is not None:
+        user_content.append({"type": "text", "text": prompt})
     messages.append(
         {
             "role": "user",
-            "content": [
-                audio_content(args.audio),
-                {"type": "text", "text": prompt},
-            ],
+            "content": user_content,
         }
     )
 

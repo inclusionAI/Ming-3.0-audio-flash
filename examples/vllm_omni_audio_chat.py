@@ -13,12 +13,18 @@ from openai import OpenAI
 
 
 DEFAULT_SYSTEM_PROMPT = (
-    "You are a voice assistant. Answer questions or execute commands based on "
-    "the audio content. Return plain text without Markdown."
+    "You are a helpful assistant.\n"
+    "Listen to the user's audio and respond to their question or request.\n"
+    "Answer the question or carry out the requested task. For lists, provide "
+    "several concrete examples; for why/how questions, explain the main reason "
+    "or method. Follow the user's explicit instructions, including any "
+    "requirements for format, wording, and length. Answer directly and keep "
+    "your response concise but complete. Do not repeat or transcribe the "
+    "request unless asked to do so. Before responding, silently check that "
+    "your answer satisfies the requested constraints."
 )
-DEFAULT_PROMPT = "Answer the question or follow the instruction in the audio."
 ASR_PROMPT = (
-    "Please recognize the language of this speech and transcribe it, placing a ‘\\t’ "
+    "Please recognize the language of this speech and transcribe it, placing a `\\t` "
     "between the identified language and the transcribe."
 )
 
@@ -70,6 +76,33 @@ def resolve_model(client: OpenAI, requested_model: str | None) -> str:
     if not models:
         raise RuntimeError("The server returned no models; pass --model explicitly")
     return models[0].id
+
+
+def build_messages(
+    args: argparse.Namespace, audio_content: dict[str, object]
+) -> list[dict[str, object]]:
+    if args.task == "asr":
+        return [
+            {
+                "role": "user",
+                "content": [
+                    audio_content,
+                    {"type": "text", "text": args.prompt},
+                ],
+            }
+        ]
+    if args.prompt_as_system:
+        return [
+            {"role": "system", "content": args.prompt},
+            {"role": "user", "content": [audio_content]},
+        ]
+    user_content = [audio_content]
+    if args.prompt is not None:
+        user_content.insert(0, {"type": "text", "text": args.prompt})
+    return [
+        {"role": "system", "content": args.system_prompt},
+        {"role": "user", "content": user_content},
+    ]
 
 
 def parse_args() -> argparse.Namespace:
@@ -148,8 +181,10 @@ def parse_args() -> argparse.Namespace:
         parser.error("--prompt-text requires --ref-audio")
     if args.task == "asr" and args.prompt_as_system:
         parser.error("--prompt-as-system cannot be used with --task asr")
-    if args.prompt is None:
-        args.prompt = ASR_PROMPT if args.task == "asr" else DEFAULT_PROMPT
+    if args.prompt is None and args.task == "asr":
+        args.prompt = ASR_PROMPT
+    if args.prompt_as_system and args.prompt is None:
+        parser.error("--prompt-as-system requires --prompt")
     return args
 
 
@@ -162,32 +197,7 @@ def main() -> None:
         "type": "audio_url",
         "audio_url": {"url": audio_data_url(args.audio)},
     }
-    if args.task == "asr":
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    audio_content,
-                    {"type": "text", "text": args.prompt},
-                ],
-            }
-        ]
-    elif args.prompt_as_system:
-        messages = [
-            {"role": "system", "content": args.prompt},
-            {"role": "user", "content": [audio_content]},
-        ]
-    else:
-        messages = [
-            {"role": "system", "content": args.system_prompt},
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": args.prompt},
-                    audio_content,
-                ],
-            },
-        ]
+    messages = build_messages(args, audio_content)
 
     request = {
         "model": model,

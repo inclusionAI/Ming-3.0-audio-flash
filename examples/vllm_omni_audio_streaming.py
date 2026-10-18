@@ -15,6 +15,19 @@ from pathlib import Path
 import requests
 
 
+DEFAULT_SYSTEM_PROMPT = (
+    "You are a helpful assistant.\n"
+    "Listen to the user's audio and respond to their question or request.\n"
+    "Answer the question or carry out the requested task. For lists, provide "
+    "several concrete examples; for why/how questions, explain the main reason "
+    "or method. Follow the user's explicit instructions, including any "
+    "requirements for format, wording, and length. Answer directly and keep "
+    "your response concise but complete. Do not repeat or transcribe the "
+    "request unless asked to do so. Before responding, silently check that "
+    "your answer satisfies the requested constraints."
+)
+
+
 def talker_options(args: argparse.Namespace) -> dict[str, str]:
     if args.ref_audio is None:
         options = {"voice_mode": "ip"}
@@ -38,7 +51,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default=os.getenv("MING_MODEL"))
     parser.add_argument(
         "--system-prompt",
-        default="Answer the question in the audio briefly without Markdown.",
+        default=DEFAULT_SYSTEM_PROMPT,
     )
     voice = parser.add_mutually_exclusive_group()
     voice.add_argument(

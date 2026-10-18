@@ -223,7 +223,7 @@ pip install -r requirements-client.txt
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --task asr \
-  --prompt "Please recognize the language of this speech and transcribe it, placing a ‘\t’ between the identified language and the transcribe." \
+  --prompt 'Please recognize the language of this speech and transcribe it, placing a `\t` between the identified language and the transcribe.' \
   --max-tokens 256 \
   --no-repeat-ngram-size 10
 ```
@@ -277,11 +277,10 @@ python examples/sglang_audio_chat.py examples/audio/introduce_ant_group.wav \
   --max-tokens 256
 ```
 
-For general audio understanding, provide a custom instruction:
+For spoken question answering, use the validated default system prompt:
 
 ```bash
-python examples/sglang_audio_chat.py examples/audio/introduce_ant_group.wav \
-  --prompt "Answer the question or follow the instruction in the audio."
+python examples/sglang_audio_chat.py examples/audio/introduce_ant_group.wav
 ```
 
 Override the endpoint or served model with `--base-url` and `--model`, or with
@@ -303,7 +302,7 @@ pip install -r requirements-transformers.txt
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
   --model "$MODEL_PATH" \
   --task asr \
-  --prompt "Please recognize the language of this speech and transcribe it, placing a ‘\t’ between the identified language and the transcribe." \
+  --prompt 'Please recognize the language of this speech and transcribe it, placing a `\t` between the identified language and the transcribe.' \
   --max-new-tokens 256 \
   --no-repeat-ngram-size 10
 ```
@@ -312,8 +311,7 @@ python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
 
 ```bash
 python examples/transformers_audio.py examples/audio/introduce_ant_group.wav \
-  --model "$MODEL_PATH" \
-  --prompt "Answer the question or follow the instruction in the audio."
+  --model "$MODEL_PATH"
 ```
 
 **Thinker + native Talker**
@@ -325,7 +323,6 @@ without starting a vLLM-Omni server:
 python examples/transformers_thinker_talker.py \
   --model "$MODEL_PATH" \
   --audio examples/audio/introduce_ant_group.wav \
-  --prompt "Answer the question or follow the instruction in the audio." \
   --ip-name US_Stella \
   --thinker-max-memory 72GiB \
   --output outputs/answer.wav
@@ -337,7 +334,6 @@ Reference-audio voice cloning is also supported:
 python examples/transformers_thinker_talker.py \
   --model "$MODEL_PATH" \
   --audio examples/audio/introduce_ant_group.wav \
-  --prompt "Answer the question or follow the instruction in the audio." \
   --ref-audio path/to/reference.wav \
   --prompt-text "<exact transcript of the reference audio>" \
   --output outputs/cloned_answer.wav
