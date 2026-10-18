@@ -165,10 +165,12 @@ name contains `tiny`. Set `MING_MODEL_VARIANT` explicitly when using a custom
 directory name.
 
 > [!NOTE]
-> The Flash full-audio profile uses four GPUs for the thinker and a separate
-> fifth GPU for the Talker. The Tiny full-audio profile uses one GPU per stage.
-> Text and ASR profiles are thinker-only and retain their smaller GPU layouts. Adjust `devices`,
-> sequence limits, and `gpu_memory_utilization` in `deploy/*.yaml` for your
+> The default Flash profiles use tensor parallelism across eight GPUs. This is
+> required for the default 128K context length on 80 GB H800 GPUs because vLLM
+> reserves KV-cache memory from the configured context length at startup. In
+> the full-audio profile, the Talker reuses GPU 7 with a separate memory budget.
+> The Tiny full-audio profile uses one GPU per stage. Adjust `devices`, context
+> and sequence limits, and `gpu_memory_utilization` in `deploy/*.yaml` for your
 > hardware.
 
 #### SGLang

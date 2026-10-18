@@ -7,6 +7,9 @@ music understanding, and tool calling. Their metadata is documented in
 Run all commands from the repository root and set `MODEL_PATH` to the downloaded
 or local model directory.
 
+The default Flash vLLM-Omni profiles use TP=8 across eight GPUs for the 128K
+context length. The full speech-output profile reuses GPU 7 for the Talker.
+
 Start the dedicated ASR profile for speech recognition:
 
 ```bash
