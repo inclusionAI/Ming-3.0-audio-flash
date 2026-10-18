@@ -179,7 +179,11 @@ def main() -> None:
     }
     if args.no_repeat_ngram_size is not None:
         extra_body["sampling_params_list"] = [
-            {"extra_args": {"no_repeat_ngram_size": args.no_repeat_ngram_size}}
+            {
+                "temperature": args.temperature,
+                "max_tokens": args.max_tokens,
+                "extra_args": {"no_repeat_ngram_size": args.no_repeat_ngram_size},
+            }
         ]
     if args.audio_response:
         extra_body["additional_information"] = talker_options(args)
@@ -199,7 +203,9 @@ def main() -> None:
 
     if args.audio_response:
         if message.audio is None or not message.audio.data:
-            raise RuntimeError("The server returned no audio; use the full deploy profile")
+            raise RuntimeError(
+                "The server returned no audio; use the full deploy profile"
+            )
         args.output_audio.parent.mkdir(parents=True, exist_ok=True)
         args.output_audio.write_bytes(base64.b64decode(message.audio.data))
         print(f"Saved audio response to {args.output_audio}")
