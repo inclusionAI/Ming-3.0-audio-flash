@@ -43,6 +43,26 @@ def talker_options(args: argparse.Namespace) -> dict[str, str]:
     }
 
 
+def request_extra_body(args: argparse.Namespace) -> dict[str, object]:
+    extra_body: dict[str, object] = {
+        "chat_template_kwargs": {"enable_thinking": args.thinking},
+        "top_k": args.top_k,
+    }
+    if args.no_repeat_ngram_size is not None:
+        extra_body["sampling_params_list"] = [
+            {
+                "temperature": args.temperature,
+                "top_p": args.top_p,
+                "top_k": args.top_k,
+                "max_tokens": args.max_tokens,
+                "extra_args": {"no_repeat_ngram_size": args.no_repeat_ngram_size},
+            }
+        ]
+    if args.audio_response:
+        extra_body["additional_information"] = talker_options(args)
+    return extra_body
+
+
 def resolve_model(client: OpenAI, requested_model: str | None) -> str:
     if requested_model:
         return requested_model
@@ -80,6 +100,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default=os.getenv("MING_MODEL"))
     parser.add_argument("--max-tokens", type=int, default=4096)
     parser.add_argument("--temperature", type=float, default=0.0)
+    parser.add_argument("--top-p", type=float, default=1.0)
+    parser.add_argument("--top-k", type=int, default=-1)
     parser.add_argument(
         "--thinking",
         action="store_true",
@@ -172,21 +194,10 @@ def main() -> None:
         "messages": messages,
         "modalities": modalities,
         "temperature": args.temperature,
+        "top_p": args.top_p,
         "max_tokens": args.max_tokens,
     }
-    extra_body = {
-        "chat_template_kwargs": {"enable_thinking": args.thinking},
-    }
-    if args.no_repeat_ngram_size is not None:
-        extra_body["sampling_params_list"] = [
-            {
-                "temperature": args.temperature,
-                "max_tokens": args.max_tokens,
-                "extra_args": {"no_repeat_ngram_size": args.no_repeat_ngram_size},
-            }
-        ]
-    if args.audio_response:
-        extra_body["additional_information"] = talker_options(args)
+    extra_body = request_extra_body(args)
     if extra_body:
         request["extra_body"] = extra_body
 
