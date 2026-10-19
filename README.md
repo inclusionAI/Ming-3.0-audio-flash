@@ -1,6 +1,6 @@
 <div align="center">
 
-# Ming-3.0-audio-flash
+<h1><img src="assets/ming-3.0-audio-logo.png" alt="Ming logo" height="42"> Ming-3.0-audio-flash</h1>
 
 ### Hear clearly. Understand deeply. Act intelligently.
 
