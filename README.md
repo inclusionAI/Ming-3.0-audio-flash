@@ -22,7 +22,7 @@ A native audio model built for real-world speech recognition, audio understandin
 ## ✨ Highlights
 
 - 🎙️ **Complex speech recognition** — Recognizes Chinese and English speech across dialects, accents, noisy environments, and multi-speaker meetings.
-- ⏱️ **Long-audio understanding** — Comprehends and analyzes recordings up to hours in length.
+- ⏱️ **Long-audio understanding** — Comprehends and analyzes long-form recordings.
 - 🎧 **Multi-dimensional perception** — Understands fine-grained speech, non-speech sounds, acoustic scenes, and music.
 - 💡 **Audio reasoning** — Analyzes and reasons directly over audio content.
 - 🗣️ **Audio interaction** — Supports end-to-end spoken dialogue with optional synthesized speech output.
