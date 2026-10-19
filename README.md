@@ -24,27 +24,18 @@ reasoning, and end-to-end spoken interaction.
 
 ## 🧩 Model Variants
 
-- **[Ming-3.0-audio-flash](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)** —
-  A 126B-parameter Mixture-of-Experts model with 6.5B activated parameters.
-  This is the model used by the examples and benchmark results below.
-- **[Ming-3.0-audio-tiny](https://huggingface.co/inclusionAI/Ming-3.0-audio-tiny)** —
-  A compact 9.3B-parameter Mixture-of-Experts model with 2.7B activated
-  parameters. See its model card for checkpoint details and usage guidance.
+- **[Ming-3.0-audio-flash](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)** — A 126B-parameter Mixture-of-Experts model with 6.5B activated parameters. This is the model used by the examples and benchmark results below.
+- **[Ming-3.0-audio-tiny](https://huggingface.co/inclusionAI/Ming-3.0-audio-tiny)** — A compact 9.3B-parameter Mixture-of-Experts model with 2.7B activated parameters. See its model card for checkpoint details and usage guidance.
 
 ## ✨ Highlights
 
-- 🎙️ **Complex speech recognition** — Recognizes Chinese and English speech
-  across dialects, accents, noisy environments, and multi-speaker meetings.
-- ⏱️ **Long-audio understanding** — Comprehends and analyzes recordings up
-  to hours in length.
-- 🎧 **Multi-dimensional perception** — Understands fine-grained speech,
-  non-speech sounds, acoustic scenes, and music.
+- 🎙️ **Complex speech recognition** — Recognizes Chinese and English speech across dialects, accents, noisy environments, and multi-speaker meetings.
+- ⏱️ **Long-audio understanding** — Comprehends and analyzes recordings up to hours in length.
+- 🎧 **Multi-dimensional perception** — Understands fine-grained speech, non-speech sounds, acoustic scenes, and music.
 - 💡 **Audio reasoning** — Analyzes and reasons directly over audio content.
-- 🗣️ **Audio interaction** — Supports end-to-end spoken dialogue with optional
-  synthesized speech output.
+- 🗣️ **Audio interaction** — Supports end-to-end spoken dialogue with optional synthesized speech output.
 
-Ming-3.0-audio-flash closes the loop from **hearing the sound**, to
-**understanding the information**, to **getting the task done**.
+Ming-3.0-audio-flash closes the loop from **hearing the sound**, to **understanding the information**, to **getting the task done**.
 
 ## 🏗️ Architecture
 
