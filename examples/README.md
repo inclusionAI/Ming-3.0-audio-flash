@@ -72,7 +72,6 @@ Restart the server with the full speech-output profile:
 MING_OUTPUT_MODE=audio ./scripts/serve_vllm_omni.sh "$MODEL_PATH"
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --audio-response \
-  --ip-name US_Stella \
   --output-audio outputs/answer.wav
 ```
 
@@ -83,10 +82,12 @@ python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.
   --output-audio outputs/stream_answer.wav
 ```
 
-The Talker automatically selects a built-in IP voice for the response language.
-Pass `--ip-name` to select a specific voice from the
-[complete built-in voice list](../docs/voices.md). The defaults are `灵小柔` for
-Chinese and `US_Stella` for English. To use a cloned voice instead:
+vLLM-Omni uses the built-in IP voice `灵小柔` by default. Pass `--ip-name` to
+select another voice from the [complete built-in voice list](../docs/voices.md).
+The model directory also provides `灵楷` and `US_James` as preset reference
+voices under `voice_presets/voice_audio/`, with matching transcripts in
+`voice_presets/voice_prompts.json`. To use one of these presets, or another
+reference voice, pass its WAV file and exact transcript:
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \

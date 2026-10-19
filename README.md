@@ -193,11 +193,12 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --audio-response \
-  --ip-name US_Stella \
   --output-audio outputs/answer.wav
 ```
 
-By default, the Talker uses IP voice routing and selects a built-in voice for the response language. Pass `--ip-name` to select a specific voice; see the [complete built-in voice list](docs/voices.md). The defaults are `灵小柔` for Chinese and `US_Stella` for English. Voice names must match the list exactly. `--ip-name` selects a built-in voice and cannot be combined with `--ref-audio`. To clone a voice from a reference WAV instead:
+By default, vLLM-Omni uses the built-in IP voice `灵小柔`. Pass `--ip-name` to select another IP voice from the [complete built-in voice list](docs/voices.md). Voice names must match the list exactly, and `--ip-name` cannot be combined with `--ref-audio`.
+
+The model directory also provides two preset reference voices, `灵楷` and `US_James`, under `voice_presets/voice_audio/`. Their matching transcripts are recorded in `voice_presets/voice_prompts.json`. Use these presets, or another reference WAV with its exact transcript, through `--ref-audio` and `--prompt-text`:
 
 ```bash
 python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
@@ -211,7 +212,6 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
 
 ```bash
 python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.wav \
-  --ip-name US_Stella \
   --output-audio outputs/stream_answer.wav
 ```
 
@@ -365,7 +365,7 @@ additional_information = {
 }
 ```
 
-Omit `ip_name` to select the default built-in voice from the response language.
+Omit `ip_name` to use vLLM-Omni's default built-in IP voice, `灵小柔`.
 
 Reference-audio voice cloning uses raw base64 audio and its transcript:
 

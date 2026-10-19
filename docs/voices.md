@@ -1,13 +1,23 @@
 # Ming-3.0-audio-flash Voice List
 
-## Recommended Voices
+## Default and Preset Reference Voices
+
+vLLM-Omni uses the built-in IP voice `灵小柔` by default. The model directory
+also provides two preset reference voices for reference-audio conditioning:
+
+- `灵楷`: `voice_presets/voice_audio/灵楷.wav`
+- `US_James`: `voice_presets/voice_audio/US_James.wav`
+
+The corresponding transcripts are stored in
+`voice_presets/voice_prompts.json`. These reference presets are distinct from
+the built-in IP voices selected through `ip_name`.
+
+## Recommended IP Voices
 
 | IP Name | Language | Characteristics and Uses |
 | :--- | :--- | :--- |
-| US_James | English (American) | Male voice suited to narration, explainers, and documentaries. |
 | US_Stella | English | - |
 | 灵小柔 | Chinese | Bright, sweet young female voice with clear diction, ideal for voice assistants and customer service. |
-| 灵楷 | Chinese | Warm, resonant young male voice suited to radio, documentaries, and audiobooks. |
 
 ## Other English Voices
 
