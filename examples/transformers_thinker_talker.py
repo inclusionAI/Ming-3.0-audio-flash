@@ -72,7 +72,7 @@ def parse_args() -> argparse.Namespace:
         help="Use --prompt as the system message and send only audio as user content",
     )
     voice = parser.add_mutually_exclusive_group()
-    voice.add_argument("--ip-name", help="IP voice, for example 灵小柔")
+    voice.add_argument("--voice", help="IP voice, for example 灵小柔")
     voice.add_argument("--ref-audio", type=Path, help="Reference WAV for voice cloning")
     voice.add_argument("--ref-audio-base64", help="Base64-encoded reference WAV")
     voice.add_argument(
@@ -230,7 +230,7 @@ def main() -> None:
     )
     audio = talker.synthesize(
         generated,
-        ip_name=args.ip_name or "灵小柔",
+        ip_name=args.voice or "灵小柔",
         reference=reference,
         prompt_text=args.prompt_text,
         language=args.language,

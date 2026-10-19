@@ -161,8 +161,6 @@ def parse_args() -> argparse.Namespace:
     voice = parser.add_mutually_exclusive_group()
     voice.add_argument(
         "--voice",
-        "--ip-name",
-        dest="voice",
         help="IP voice name or registered voice ID; defaults to the server's 灵小柔 voice",
     )
     voice.add_argument(

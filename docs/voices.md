@@ -15,7 +15,7 @@ available as built-in IP voices.
 
 ## Invocation Rules
 
-- In the example clients, pass the exact, case-sensitive identifier from the tables with `--voice`. The deprecated `--ip-name` spelling remains available as a compatibility alias.
+- In the example clients, pass the exact, case-sensitive identifier from the tables with `--voice`.
 - In Chat Completions requests, pass the identifier as `audio.voice`, for example `"audio": {"format": "wav", "voice": {"id": "灵小柔"}}`.
 - For voices without emotion variants, pass the base identifier directly, such as `灵小柔`.
 - For voices with emotion variants, pass the complete listed identifier, such as `灵信远_高兴`. Do not pass the base name alone or append an unlisted emotion.
