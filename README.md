@@ -48,7 +48,7 @@ Ming-3.0-audio-flash closes the loop from **hearing the sound**, to
 
 ## 🏗️ Architecture
 
-[![Ming-3.0-audio-flash architecture](assets/ming-3.0-audio-flash-architecture.png)](assets/ming-3.0-audio-flash-architecture.png)
+![Ming-3.0-audio-flash architecture](assets/ming-3.0-audio-flash-architecture.png)
 
 ## 📊 Benchmarks
 
@@ -59,15 +59,15 @@ result, and an asterisk (`*`) indicates results obtained in our own evaluation.
 
 ### Speech Recognition
 
-[![ASR benchmark results](assets/benchmark-asr.png)](assets/benchmark-asr.png)
+![ASR benchmark results](assets/benchmark-asr.png)
 
 ### Audio Intelligence
 
-[![Audio intelligence benchmark results](assets/benchmark-audio-intelligence.png)](assets/benchmark-audio-intelligence.png)
+![Audio intelligence benchmark results](assets/benchmark-audio-intelligence.png)
 
 ### Text Intelligence
 
-[![Text intelligence benchmark results](assets/benchmark-text.png)](assets/benchmark-text.png)
+![Text intelligence benchmark results](assets/benchmark-text.png)
 
 > [!NOTE]
 > Results for comparison models are reproduced under our evaluation setup and
