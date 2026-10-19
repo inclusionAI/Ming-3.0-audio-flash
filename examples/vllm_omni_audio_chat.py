@@ -39,14 +39,21 @@ def audio_data_url(path: Path) -> str:
 
 def talker_options(args: argparse.Namespace) -> dict[str, str]:
     if args.ref_audio is None:
-        options = {"voice_mode": "ip"}
-        if args.ip_name:
-            options["ip_name"] = args.ip_name
-        return options
+        return {}
     return {
+        "voice_mode": "reference",
         "ref_audio": base64.b64encode(args.ref_audio.read_bytes()).decode("ascii"),
         "prompt_text": args.prompt_text,
     }
+
+
+def output_audio_options(
+    args: argparse.Namespace, audio_format: str
+) -> dict[str, object]:
+    options: dict[str, object] = {"format": audio_format}
+    if args.voice is not None:
+        options["voice"] = {"id": args.voice}
+    return options
 
 
 def request_extra_body(args: argparse.Namespace) -> dict[str, object]:
@@ -64,7 +71,7 @@ def request_extra_body(args: argparse.Namespace) -> dict[str, object]:
                 "extra_args": {"no_repeat_ngram_size": args.no_repeat_ngram_size},
             }
         ]
-    if args.audio_response:
+    if args.audio_response and args.ref_audio is not None:
         extra_body["additional_information"] = talker_options(args)
     return extra_body
 
@@ -153,13 +160,15 @@ def parse_args() -> argparse.Namespace:
     )
     voice = parser.add_mutually_exclusive_group()
     voice.add_argument(
+        "--voice",
         "--ip-name",
-        help="Built-in voice name; omit it to select by response language",
+        dest="voice",
+        help="IP voice name or registered voice ID; defaults to the server's 灵小柔 voice",
     )
     voice.add_argument(
         "--ref-audio",
         type=Path,
-        help="Reference WAV for voice cloning; omit it to use automatic IP voices",
+        help="Reference WAV for voice cloning; omit it to use an IP or registered voice",
     )
     parser.add_argument(
         "--prompt-text",
@@ -207,6 +216,8 @@ def main() -> None:
         "top_p": args.top_p,
         "max_tokens": args.max_tokens,
     }
+    if args.audio_response:
+        request["audio"] = output_audio_options(args, "wav")
     extra_body = request_extra_body(args)
     if extra_body:
         request["extra_body"] = extra_body

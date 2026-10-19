@@ -110,7 +110,7 @@ source .venv-vllm-omni/bin/activate
 pip install -r requirements-vllm-omni.txt
 ```
 
-This branch contains the `bailing_moe_v3_audio` pipeline and the current Ming Talker request interface. It supports IP voice routing through `voice_mode` and voice cloning through `ref_audio` plus `prompt_text`. Legacy builds that only support `voice_name` are incompatible with the speech-output examples below.
+This branch contains the `bailing_moe_v3_audio` pipeline and the current Ming Talker request interface. It supports IP and registered voice IDs through Chat Completions `audio.voice`, and voice cloning through `ref_audio` plus `prompt_text`.
 
 Start text-output serving for audio understanding and reasoning:
 
@@ -200,7 +200,7 @@ python examples/vllm_omni_audio_chat.py examples/audio/introduce_ant_group.wav \
   --output-audio outputs/answer.wav
 ```
 
-By default, vLLM-Omni uses the built-in IP voice `灵小柔`. Pass `--ip-name` to select another IP voice from the [complete built-in voice list](docs/voices.md). Voice names must match the list exactly, and `--ip-name` cannot be combined with `--ref-audio`.
+By default, vLLM-Omni uses the built-in IP voice `灵小柔`. Pass `--voice` to select another IP voice from the [complete built-in voice list](docs/voices.md), or a registered voice ID returned by `GET /v1/audio/voices`. The clients send this as Chat Completions `audio.voice: {"id": "..."}`. Voice selection cannot be combined with `--ref-audio`; omitting it uses the server default.
 
 The model directory also provides two preset reference voices, `灵楷` and `US_James`, under `voice_presets/voice_audio/`. Their matching transcripts are recorded in `voice_presets/voice_prompts.json`. Use these presets, or another reference WAV with its exact transcript, through `--ref-audio` and `--prompt-text`:
 
@@ -275,7 +275,7 @@ Use the Talker implementation bundled with the model to generate speech without 
 python examples/transformers_thinker_talker.py \
   --model "$MODEL_PATH" \
   --audio examples/audio/introduce_ant_group.wav \
-  --ip-name US_Stella \
+  --voice US_Stella \
   --thinker-max-memory 72GiB \
   --output outputs/answer.wav
 ```
@@ -360,21 +360,23 @@ messages = [
 ]
 ```
 
-Talker IP voice routing uses:
+Chat Completions speech output selects an IP or registered voice through `audio.voice`:
 
 ```python
-additional_information = {
-    "voice_mode": "ip",
-    "ip_name": "灵小柔",
+audio = {
+    "format": "wav",  # The streaming client uses vLLM-Omni's raw PCM format.
+    "voice": {"id": "灵小柔"},
 }
 ```
 
-Omit `ip_name` to use vLLM-Omni's default built-in IP voice, `灵小柔`.
+The server checks its IP voice list before looking up registered reference voices.
+Omit `voice` to use the default built-in IP voice, `灵小柔`.
 
 Reference-audio voice cloning uses raw base64 audio and its transcript:
 
 ```python
 additional_information = {
+    "voice_mode": "reference",
     "ref_audio": reference_audio_base64,
     "prompt_text": reference_audio_transcript,
 }

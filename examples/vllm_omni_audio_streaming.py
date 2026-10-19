@@ -30,14 +30,21 @@ DEFAULT_SYSTEM_PROMPT = (
 
 def talker_options(args: argparse.Namespace) -> dict[str, str]:
     if args.ref_audio is None:
-        options = {"voice_mode": "ip"}
-        if args.ip_name:
-            options["ip_name"] = args.ip_name
-        return options
+        return {}
     return {
+        "voice_mode": "reference",
         "ref_audio": base64.b64encode(args.ref_audio.read_bytes()).decode("ascii"),
         "prompt_text": args.prompt_text,
     }
+
+
+def output_audio_options(
+    args: argparse.Namespace, audio_format: str
+) -> dict[str, object]:
+    options: dict[str, object] = {"format": audio_format}
+    if args.voice is not None:
+        options["voice"] = {"id": args.voice}
+    return options
 
 
 def parse_args() -> argparse.Namespace:
@@ -55,20 +62,24 @@ def parse_args() -> argparse.Namespace:
     )
     voice = parser.add_mutually_exclusive_group()
     voice.add_argument(
+        "--voice",
         "--ip-name",
-        help="Built-in voice name; omit it to select by response language",
+        dest="voice",
+        help="IP voice name or registered voice ID; defaults to the server's 灵小柔 voice",
     )
     voice.add_argument(
         "--ref-audio",
         type=Path,
-        help="Reference WAV for voice cloning; omit it to use automatic IP voices",
+        help="Reference WAV for voice cloning; omit it to use an IP or registered voice",
     )
     parser.add_argument(
         "--prompt-text",
         help="Transcript of --ref-audio, required for voice cloning",
     )
     parser.add_argument("--max-tokens", type=int, default=128)
-    parser.add_argument("--output-audio", type=Path, default=Path("outputs/stream_answer.wav"))
+    parser.add_argument(
+        "--output-audio", type=Path, default=Path("outputs/stream_answer.wav")
+    )
     parser.add_argument("--runs", type=int, default=1)
     args = parser.parse_args()
     if not args.audio.is_file():
@@ -91,7 +102,9 @@ def api_url(base_url: str, endpoint: str) -> str:
     return f"{base_url}/{endpoint.lstrip('/')}"
 
 
-def resolve_model(session: requests.Session, base_url: str, requested_model: str | None) -> str:
+def resolve_model(
+    session: requests.Session, base_url: str, requested_model: str | None
+) -> str:
     if requested_model:
         return requested_model
     response = session.get(api_url(base_url, "models"), timeout=30)
@@ -120,12 +133,14 @@ def stream_once(
             },
         ],
         "modalities": ["text", "audio"],
-        "audio": {"format": "pcm"},
-        "additional_information": talker_options(args),
+        "audio": output_audio_options(args, "pcm"),
         "temperature": 0.0,
         "max_tokens": args.max_tokens,
         "stream": True,
     }
+    controls = talker_options(args)
+    if controls:
+        payload["additional_information"] = controls
     start = time.perf_counter()
     response = session.post(
         api_url(args.base_url, "chat/completions"),
@@ -177,13 +192,14 @@ def stream_once(
         metrics["done_ms"] = (time.perf_counter() - start) * 1000
         metrics["finish_reason"] = metrics["finish_reason"] or "stream ended"
     audio = b"".join(pcm_parts)
-    if audio:
-        args.output_audio.parent.mkdir(parents=True, exist_ok=True)
-        with wave.open(str(args.output_audio), "wb") as output:
-            output.setnchannels(channels)
-            output.setsampwidth(2)
-            output.setframerate(sample_rate)
-            output.writeframes(audio)
+    if not audio:
+        raise RuntimeError("The server returned no audio; use the full deploy profile")
+    args.output_audio.parent.mkdir(parents=True, exist_ok=True)
+    with wave.open(str(args.output_audio), "wb") as output:
+        output.setnchannels(channels)
+        output.setsampwidth(2)
+        output.setframerate(sample_rate)
+        output.writeframes(audio)
     metrics["audio_seconds"] = len(audio) / (2 * channels * sample_rate)
     metrics["arrivals"] = arrivals
     metrics["text"] = "".join(text_parts)

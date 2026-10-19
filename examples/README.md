@@ -82,8 +82,11 @@ python examples/vllm_omni_audio_streaming.py examples/audio/introduce_ant_group.
   --output-audio outputs/stream_answer.wav
 ```
 
-vLLM-Omni uses the built-in IP voice `灵小柔` by default. Pass `--ip-name` to
-select another voice from the [complete built-in voice list](../docs/voices.md).
+vLLM-Omni uses the built-in IP voice `灵小柔` by default. Pass `--voice` to
+select another voice from the [complete built-in voice list](../docs/voices.md),
+or a registered voice ID returned by `GET /v1/audio/voices`. Both clients send
+Chat Completions `audio.voice: {"id": "..."}`. Voice selection cannot be combined
+with `--ref-audio`.
 The model directory also provides `灵楷` and `US_James` as preset reference
 voices under `voice_presets/voice_audio/`, with matching transcripts in
 `voice_presets/voice_prompts.json`. To use one of these presets, or another
@@ -130,7 +133,7 @@ For end-to-end Thinker and native Talker inference:
 python examples/transformers_thinker_talker.py \
   --model "$MODEL_PATH" \
   --audio examples/audio/introduce_ant_group.wav \
-  --ip-name US_Stella \
+  --voice US_Stella \
   --thinker-max-memory 72GiB \
   --output outputs/answer.wav
 ```

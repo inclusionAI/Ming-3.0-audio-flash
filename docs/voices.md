@@ -10,17 +10,18 @@ also provides two preset reference voices for reference-audio conditioning:
 
 The corresponding transcripts are stored in
 `voice_presets/voice_prompts.json`. Reference-audio conditioning uses a
-different input path from `ip_name`; `灵楷` and `US_James` are also available
-as built-in IP voices.
+different input path from `audio.voice`; `灵楷` and `US_James` are also
+available as built-in IP voices.
 
 ## Invocation Rules
 
-- Pass the exact, case-sensitive identifier from the tables as `ip_name`.
+- In the example clients, pass the exact, case-sensitive identifier from the tables with `--voice`. The deprecated `--ip-name` spelling remains available as a compatibility alias.
+- In Chat Completions requests, pass the identifier as `audio.voice`, for example `"audio": {"format": "wav", "voice": {"id": "灵小柔"}}`.
 - For voices without emotion variants, pass the base identifier directly, such as `灵小柔`.
 - For voices with emotion variants, pass the complete listed identifier, such as `灵信远_高兴`. Do not pass the base name alone or append an unlisted emotion.
-- Built-in IP voices and reference-audio conditioning are separate voice-selection methods; do not use `ip_name` together with `ref_audio` and `prompt_text`.
-- If neither `ip_name` nor reference audio is supplied, vLLM-Omni uses `灵小柔`.
-- `灵楷` and `US_James` may be selected either by `ip_name` or through their preset reference audio and matching transcripts.
+- Built-in IP voices and reference-audio conditioning are separate voice-selection methods; do not use `--voice` together with `--ref-audio` and `--prompt-text`.
+- If neither `audio.voice` nor reference audio is supplied, vLLM-Omni uses `灵小柔`.
+- `灵楷` and `US_James` may be selected either with `--voice` or through their preset reference audio and matching transcripts.
 
 ## Recommended IP Voices
 
