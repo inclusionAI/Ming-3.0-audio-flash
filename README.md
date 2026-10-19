@@ -16,8 +16,7 @@ A native audio model built for real-world speech recognition, audio understandin
 
 
 
-
-https://github.com/user-attachments/assets/bf7dc850-8b1a-4b0b-8e60-e8b84c6853e9
+https://github.com/user-attachments/assets/2accce07-c451-4132-9fc4-1ed375888a24
 
 
 
