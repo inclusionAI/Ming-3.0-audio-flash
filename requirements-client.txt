@@ -1,8 +1,2 @@
 openai>=2.54.0,<3
 requests>=2.32.0,<3
-pandas
-pyarrow
-datasets
-oss2
-mdatasets==0.4.16
-whisper-normalizer==0.1.15

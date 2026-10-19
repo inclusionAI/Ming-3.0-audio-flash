@@ -25,7 +25,7 @@ reasoning, and end-to-end spoken interaction.
 ## 🧩 Model Variants
 
 - **[Ming-3.0-audio-flash](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)** —
-  A 127B-parameter Mixture-of-Experts model with 7.3B activated parameters.
+  A 126B-parameter Mixture-of-Experts model with 6.5B activated parameters.
   This is the model used by the examples and benchmark results below.
 - **[Ming-3.0-audio-tiny](https://huggingface.co/inclusionAI/Ming-3.0-audio-tiny)** —
   A compact 10.3B-parameter Mixture-of-Experts model with 3.5B activated

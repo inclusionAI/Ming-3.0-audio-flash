@@ -11,12 +11,4 @@ The directory contains the sample audio used by the repository examples:
 
 Technical metadata is also available in [`manifest.json`](manifest.json).
 
-Reference speech content for `introduce_ant_group.wav`:
-
-Reference speech content:
-
-```text
-介绍一下蚂蚁集团。
-```
-
 Expected model outputs are intentionally not included.
