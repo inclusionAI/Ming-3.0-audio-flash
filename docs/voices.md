@@ -13,12 +13,21 @@ The corresponding transcripts are stored in
 different input path from `ip_name`; `灵楷` and `US_James` are also available
 as built-in IP voices.
 
+## Invocation Rules
+
+- Pass the exact, case-sensitive identifier from the tables as `ip_name`.
+- For voices without emotion variants, pass the base identifier directly, such as `灵小柔`.
+- For voices with emotion variants, pass the complete listed identifier, such as `灵信远_高兴`. Do not pass the base name alone or append an unlisted emotion.
+- Built-in IP voices and reference-audio conditioning are separate voice-selection methods; do not use `ip_name` together with `ref_audio` and `prompt_text`.
+- If neither `ip_name` nor reference audio is supplied, vLLM-Omni uses `灵小柔`.
+- `灵楷` and `US_James` may be selected either by `ip_name` or through their preset reference audio and matching transcripts.
+
 ## Recommended IP Voices
 
 | IP Name | Language | Characteristics and Uses |
 | :--- | :--- | :--- |
 | US_James | English (American) | Male voice suited to narration, explainers, and documentaries. |
-| US_Stella | English | - |
+| US_Stella | English | Warm, youthful voice suited to narration and conversational use. |
 | 灵小柔 | Chinese | Bright, sweet young female voice with clear diction, ideal for voice assistants and customer service. |
 | 灵楷 | Chinese | Warm, resonant young male voice suited to radio, documentaries, and audiobooks. |
 
