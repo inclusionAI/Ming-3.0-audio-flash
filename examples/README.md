@@ -133,7 +133,7 @@ For end-to-end Thinker and native Talker inference:
 python examples/transformers_thinker_talker.py \
   --model "$MODEL_PATH" \
   --audio examples/audio/introduce_ant_group.wav \
-  --voice US_Stella \
+  --ip-name US_Stella \
   --thinker-max-memory 72GiB \
   --output outputs/answer.wav
 ```
