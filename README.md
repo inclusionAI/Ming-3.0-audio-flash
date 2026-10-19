@@ -12,11 +12,11 @@ reasoning, and end-to-end spoken interaction.
 [![Serving: vLLM--Omni](https://img.shields.io/badge/Serving-vLLM--Omni-7c3aed.svg)](requirements-vllm-omni.txt)
 [![Serving: SGLang](https://img.shields.io/badge/Serving-SGLang-2563eb.svg)](requirements-sglang.txt)
 
-[Hugging Face · Flash](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)
-· [Hugging Face · Tiny](https://huggingface.co/inclusionAI/Ming-3.0-audio-tiny)
-· [ModelScope · Flash](https://modelscope.cn/models/inclusionAI/Ming-3.0-audio-flash)
-· [Cookbook](cookbook.ipynb)
-· [Examples](examples/README.md)
+[🤗 Hugging Face · Flash](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)
+· [🤗 Hugging Face · Tiny](https://huggingface.co/inclusionAI/Ming-3.0-audio-tiny)
+· [🤖 ModelScope · Flash](https://modelscope.cn/models/inclusionAI/Ming-3.0-audio-flash)
+· [📓 Cookbook](cookbook.ipynb)
+· [💻 Examples](examples/README.md)
 
 </div>
 
@@ -74,9 +74,7 @@ result, and an asterisk (`*`) indicates results obtained in our own evaluation.
 </p>
 
 > [!NOTE]
-> Results for comparison models are reproduced under our evaluation setup and
-> may differ from their official reports due to differences in prompts,
-> decoding settings, model versions, and evaluation pipelines.
+> Results for comparison models are reproduced under our evaluation setup and may differ from their official reports due to differences in prompts, decoding settings, model versions, and evaluation pipelines.
 
 ## 🧭 Inference Options
 
