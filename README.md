@@ -14,6 +14,10 @@ A native audio model built for real-world speech recognition, audio understandin
 
 ---
 
+
+https://github.com/user-attachments/assets/63f6574c-0ff7-4e81-9b00-965761274ae7
+
+
 ## 🧩 Model Variants
 
 - **[Ming-3.0-audio-flash](https://huggingface.co/inclusionAI/Ming-3.0-audio-flash)** — A 126B-parameter Mixture-of-Experts model with 6.5B activated parameters. This is the model used by the examples and benchmark results below.
