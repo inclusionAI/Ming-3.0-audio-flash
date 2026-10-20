@@ -2,4 +2,4 @@
 --extra-index-url https://download.pytorch.org/whl/cu129
 vllm==0.30.0
 torchaudio==2.11.0+cu129
-vllm-omni[ming-tts] @ git+https://github.com/inclusionAI/vllm-omni.git@model/ming3-audio-flash
+vllm-omni[ming-tts] @ git+https://github.com/inclusionAI/vllm-omni.git@model/ming3-audio-flash-fixes

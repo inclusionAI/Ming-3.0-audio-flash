@@ -105,7 +105,7 @@ The model directory contains the tokenizer, processor, model implementation, che
 
 #### vLLM-Omni
 
-Install the Ming-3.0-audio-flash branch of [inclusionAI/vllm-omni](https://github.com/inclusionAI/vllm-omni/tree/model/ming3-audio-flash):
+Install the Ming-3.0-audio-flash fixes branch of [inclusionAI/vllm-omni](https://github.com/inclusionAI/vllm-omni/tree/model/ming3-audio-flash-fixes):
 
 ```bash
 python3 -m venv .venv-vllm-omni
