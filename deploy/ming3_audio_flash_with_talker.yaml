@@ -1,6 +1,6 @@
 # Ming-3.0-audio-flash: audio understanding plus optional speech output.
 #
-# Stage 0 runs TP=8 across GPUs 0-7. Stage 1 reuses GPU 7 for the
+# Stage 0 runs TP=4 across GPUs 0-3. Stage 1 reuses GPU 3 for the
 # self-contained Qwen2 + CFM + AudioVAE talker. Use the thinker-only profile
 # when only ASR / Speech-QA text is required.
 pipeline: bailing_moe_v3_audio
@@ -15,8 +15,8 @@ stages:
   - stage_id: 0
     limit_mm_per_prompt:
       audio: 20
-    devices: "0,1,2,3,4,5,6,7"
-    tensor_parallel_size: 8
+    devices: "0,1,2,3"
+    tensor_parallel_size: 4
     enable_expert_parallel: false
     disable_custom_all_reduce: true
     max_num_seqs: 1
@@ -40,7 +40,7 @@ stages:
       ignore_eos: false
 
   - stage_id: 1
-    devices: "7"
+    devices: "3"
     max_num_seqs: 1
     max_num_batched_tokens: 8192
     gpu_memory_utilization: 0.18

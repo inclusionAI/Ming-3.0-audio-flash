@@ -7,8 +7,11 @@ music understanding, and tool calling. Their metadata is documented in
 Run all commands from the repository root and set `MODEL_PATH` to the downloaded
 or local model directory.
 
-The default Flash vLLM-Omni profiles use TP=8 across eight GPUs for the 128K
-context length. The full speech-output profile reuses GPU 7 for the Talker.
+The default Flash vLLM-Omni profiles use TP=4 across four GPUs for the 128K
+context length. The full speech-output profile reuses GPU 3 for the Talker.
+The four-GPU profiles may OOM on particularly long audio inputs; when that
+happens, switch to the eight-GPU fallback profiles in `deploy/*_8gpu.yaml`
+(TP=8 across GPUs 0–7; the Talker reuses GPU 7).
 
 Start the dedicated ASR profile for speech recognition:
 

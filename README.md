@@ -143,7 +143,10 @@ MING_MODEL_VARIANT=tiny MING_OUTPUT_MODE=text ./scripts/serve_vllm_omni.sh "$MOD
 `scripts/serve_vllm_omni.sh` also detects Tiny automatically when the model directory name contains `tiny`. Set `MING_MODEL_VARIANT` explicitly when using a custom directory name.
 
 > [!NOTE]
-> The default Flash profiles use tensor parallelism across eight GPUs. This is required for the default 128K context length on 80 GB H800 GPUs because vLLM reserves KV-cache memory from the configured context length at startup. In the full-audio profile, the Talker reuses GPU 7 with a separate memory budget. The Tiny full-audio profile uses one GPU per stage. Adjust `devices`, context and sequence limits, and `gpu_memory_utilization` in `deploy/*.yaml` for your hardware.
+> The default Flash profiles use tensor parallelism across four GPUs. They keep the default 128K context length on 80 GB H800 GPUs with `max_num_seqs: 1`, since vLLM reserves KV-cache memory from the configured context length at startup. In the full-audio profile, the Talker reuses GPU 3 with a separate memory budget. The Tiny full-audio profile uses one GPU per stage. Adjust `devices`, context and sequence limits, and `gpu_memory_utilization` in `deploy/*.yaml` for your hardware.
+
+> [!TIP]
+> The four-GPU profiles may OOM on particularly long audio inputs. When that happens, you can switch to the eight-GPU fallback profiles — `deploy/ming3_audio_flash_asr_8gpu.yaml`, `deploy/ming3_audio_flash_thinker_only_8gpu.yaml`, and `deploy/ming3_audio_flash_with_talker_8gpu.yaml` — which set `tensor_parallel_size: 8` across GPUs 0–7 (and the Talker reuses GPU 7).
 
 #### SGLang
 
