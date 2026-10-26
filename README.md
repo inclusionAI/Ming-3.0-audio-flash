@@ -71,7 +71,7 @@ All scores are reported as percentages. ↑ means higher is better, while ↓ me
 | Input | Audio + text instruction | Audio + text instruction | Audio + text instruction |
 | Output | Text, or text + speech | Text | Text, or text + speech |
 | Interface | OpenAI-compatible API | OpenAI-compatible API | Hugging Face AutoClass |
-| Dependencies | `requirements-vllm-omni.txt` | `requirements-sglang.txt` | `requirements-transformers.txt` |
+| Dependencies | [`requirements-vllm-omni.txt`](requirements-vllm-omni.txt) | [`requirements-sglang.txt`](requirements-sglang.txt) | [`requirements-transformers.txt`](requirements-transformers.txt) |
 
 ## 🚀 Quick Start
 
