@@ -46,6 +46,12 @@ Ming-3.0-audio-flash closes the loop from **hearing the sound**, to **understand
 
 All scores are reported as percentages. ↑ means higher is better, while ↓ means lower is better. Ming-3.0-audio-flash is evaluated in non-thinking mode. **Bold** indicates the best result, <u>underlined</u> indicates the second-best result, and an asterisk (`*`) indicates results obtained in our own evaluation.
 
+### Speech Reasoning (Big Bench Audio)
+
+Ming-3.0-audio-flash achieves **99.8%** on Artificial Analysis's Big Bench Audio benchmark, ranking **#1 overall among all closed-source and open-source models** on the leaderboard shown below.
+
+![Artificial Analysis Speech Reasoning (Big Bench Audio) leaderboard](assets/Artificial_Analysis_Speech_Reasoning.png)
+
 ### Speech Recognition
 
 ![ASR benchmark results](assets/benchmark-asr.png)
